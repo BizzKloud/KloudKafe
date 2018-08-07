@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/changeVendorDrawerLayout"
+    android:layout_gravity="right"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:layout_scrollFlags="scroll|enterAlways">
+
+            <ImageButton
+                android:id="@+id/backButtontoMenu"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/transparent"
+                android:clickable="true"
+                android:gravity="center_vertical"
+                android:scaleType="fitStart"
+                android:src="@drawable/backarrow_icon" />
+
+            <TextView
+                android:id="@+id/textViewvendorNameTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/vendor_name"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/changeVendorButton"
+                android:layout_width="190dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="right|center_vertical"
+                android:background="@android:color/transparent"
+                android:drawableRight="@drawable/change_vendor_icon"
+                android:text="Change Vendor"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/fooditem_sdesp_menu" />
+
+        </Toolbar>
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/categoryTabs"
+            style="@style/tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="5dp"
+            app:tabGravity="fill"
+            app:tabIndicatorHeight="5dp"
+            app:tabMode="scrollable" />
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/foodItemListViewPager"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginTop="5dp"
+            android:background="@color/lightgrey"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5" />
+
+    </LinearLayout>
+
+    <!--<android.support.v4.widget.DrawerLayout-->
+        <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
+        <!--android:id="@+id/changeVendorDrawerLayout"-->
+        <!--android:layout_gravity="right"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent" >-->
+
+        <FrameLayout
+            android:id="@+id/content_frame"
+            android:layoutDirection="rtl"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+        <ListView
+            android:id="@+id/changeVendorDrawerListView"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="right"
+            android:choiceMode="singleChoice"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="10dp"
+            android:background="#111"/>
+
+    <!--</android.support.v4.widget.DrawerLayout>-->
+
+
+
+</android.support.v4.widget.DrawerLayout>
