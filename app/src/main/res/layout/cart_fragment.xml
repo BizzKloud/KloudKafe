@@ -74,7 +74,7 @@
                     android:id="@+id/ihfFC"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1.1"
+                    android:layout_weight="1"
                     android:orientation="horizontal">
 
                     <LinearLayout
@@ -114,7 +114,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginStart="10dp"
-                    android:layout_weight="2.5"
+                    android:layout_weight="2.45"
                     android:orientation="horizontal">
 
                     <TextView

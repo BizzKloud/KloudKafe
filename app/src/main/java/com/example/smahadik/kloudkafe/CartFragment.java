@@ -9,6 +9,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,9 +84,13 @@ public class CartFragment extends Fragment {
             public void onClick(View v) {
                 // continue ordering
                 Log.i("Continue Ordering" , "vendor POS: " + Home.lastVendorPosition );
-                if(Home.lastVendorPosition == -1) {
+                if (Home.navigation.getSelectedItemId() == R.id.navigation_menu) {
+                    VendorItemListFragment.drawerLayout.closeDrawer(Gravity.END);
+                }
+                else if(Home.lastVendorPosition == -1) {
                     Home.navigation.setSelectedItemId(R.id.navigation_menu);
-                }else {
+                }
+                else {
                     int lastvenpos = Home.lastVendorPosition;
                     Home.navigation.setSelectedItemId(R.id.navigation_menu);
                     Home.vendorPosition = lastvenpos;

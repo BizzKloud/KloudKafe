@@ -44,8 +44,16 @@
         <item name="android:background">@drawable/paynow_button</item>
     </style>
 
-    <style name="increase_decrease_button" >
-        <item name="android:background">@drawable/increase_decrease_button</item>
+    <style name="decrease_button" >
+        <item name="android:background">@drawable/decrease_button</item>
+    </style>
+
+    <style name="increase_button" >
+        <item name="android:background">@drawable/increase_button</item>
+    </style>
+
+    <style name="quantity" >
+        <item name="android:background">@drawable/quantity</item>
     </style>
 
     <style name="addtocart_button" >

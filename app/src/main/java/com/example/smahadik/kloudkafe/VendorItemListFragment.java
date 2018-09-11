@@ -96,7 +96,8 @@ public class VendorItemListFragment extends Fragment{
         drawerLayout.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
             @Override
             public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
+                Home.progressDialog.setMessage("Loading Your Cart");
+                Home.progressDialog.show();
                 venpos = Home.vendorPosition;
                 lastvenpos = Home.lastVendorPosition;
                 Log.i("Called Opened", String.valueOf(lastvenpos) );
@@ -106,19 +107,25 @@ public class VendorItemListFragment extends Fragment{
                 FragmentTransaction ft = fragmentManager.beginTransaction();
                 ft.replace(R.id.cartDrawerFrameLayout, new CartFragment());
                 ft.commit();
+                Home.progressDialog.dismiss();
+                super.onDrawerOpened(drawerView);
             }
 
             @Override
             public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
+                Home.progressDialog.setMessage("Loading Your Cart");
+                Home.progressDialog.show();
                 Home.vendorPosition = lastvenpos;
                 Home.lastVendorPosition = lastvenpos;
                 setupViewPager();
                 foodItemListViewPager.setCurrentItem(Home.catPosition);
                 Log.i("Called Closed", String.valueOf(lastvenpos) );
                 Log.i("Called Closed cat", String.valueOf(Home.catPosition) );
+                Home.progressDialog.dismiss();
+                super.onDrawerClosed(drawerView);
             }
         });
+
 
         foodItemListViewPager = (ViewPager) view.findViewById(R.id.foodItemListViewPager);
 //        foodItemListViewPager.addOnPageChangeListener(viewListener);
