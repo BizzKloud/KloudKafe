@@ -5,19 +5,19 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:fontFamily">@font/open_sans</item>
         <item name="colorPrimary">@android:color/holo_orange_dark</item>
-        <item name="colorPrimaryDark">#ff9d2d</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimaryDark">@color/bizzlightorange</item>
+        <item name="colorAccent">@color/bizzorange</item>
         <!--<item name="colorControlNormal">@android:color/holo_orange_dark</item>-->
-        <item name="android:color">#ffff8800</item>
-        <item name="colorControlActivated">@color/bizzblue</item>
-        <item name="android:colorForeground">#ffff8800</item>
+        <item name="android:color">@color/bizzorange</item>
+        <item name="colorControlActivated">@color/bizzorange</item>
+        <item name="android:colorForeground">@color/bizzorange</item>
         <!--<item name="android:colorControlHighlight">#ffff8800</item>-->
     </style>
 
     <style name="AppThemeTitle" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:fontFamily">@font/open_sans</item>
         <item name="colorPrimary">@color/bizzorange</item>
-        <item name="colorPrimaryDark">#ff9d2d</item>
+        <item name="colorPrimaryDark">@color/bizzlightorange</item>
         <item name="colorAccent">@color/bizzorange</item>
         <item name="android:color">@color/bizzorange</item>
         <item name="colorControlActivated">@color/bizzorange</item>
@@ -40,6 +40,14 @@
         <item name="android:background">@drawable/login_button</item>
     </style>
 
+    <style name="paynow_button" >
+        <item name="android:background">@drawable/paynow_button</item>
+    </style>
+
+    <style name="increase_decrease_button" >
+        <item name="android:background">@drawable/increase_decrease_button</item>
+    </style>
+
     <style name="addtocart_button" >
         <item name="android:background">@drawable/addtocart_button</item>
     </style>
@@ -52,7 +60,9 @@
         <item name="android:textSize">18sp</item>
     </style>
 
-
+    <style name="youmayalsolike_title" >
+        <item name="android:background">@drawable/youmayalsolike_title</item>
+    </style>
 
     <style name="RatingBar" parent="AppThemeTitle">
         <!--<item name="colorControlNormal">@android:color/transparent</item>-->

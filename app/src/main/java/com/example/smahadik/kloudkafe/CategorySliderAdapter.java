@@ -30,6 +30,7 @@ public class CategorySliderAdapter extends PagerAdapter {
     LayoutInflater layoutInflater;
     View view;
     RecyclerView recyclerviewFoodItemList;
+    public static RecyclerViewAdapterFoodItemList recyclerViewAdapterFoodItemList;
 
 
     public CategorySliderAdapter(Context context) {
@@ -55,7 +56,7 @@ public class CategorySliderAdapter extends PagerAdapter {
         view = layoutInflater.inflate(R.layout.category_item_list_fragment, container, false);
 
         recyclerviewFoodItemList = view.findViewById(R.id.recyclerviewFoodItemList);
-        RecyclerViewAdapterFoodItemList recyclerViewAdapterFoodItemList = new RecyclerViewAdapterFoodItemList(context, position);
+        recyclerViewAdapterFoodItemList = new RecyclerViewAdapterFoodItemList(context, position);
         recyclerviewFoodItemList.setLayoutManager(new GridLayoutManager(context , 1));
         recyclerviewFoodItemList.setAdapter(recyclerViewAdapterFoodItemList);
 

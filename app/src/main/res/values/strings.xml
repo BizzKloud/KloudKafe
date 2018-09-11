@@ -5,4 +5,16 @@
     <string name="title_menu">Menu</string>
     <string name="title_cart">Cart</string>
     <string name="rs">\u20B9</string>
+    <string name="tax_breakup">Tax Breakup</string>
+    <string name="ihf_breakup">IHF Breakup</string>
+    <string name="internet_handling_fee">Internet Handling Fee</string>
+    <string name="continue_ordering">CONTINUE\nORDERING</string>
+    <string name="pay_now">PAY NOW\n$ 99,99,99,999.99</string>
+    <string name="you">Y\nO\nU</string>
+    <string name="may">M\nA\nY</string>
+    <string name="also">A\nL\nS\nO</string>
+    <string name="like">L\nI\nK\nE</string>
 </resources>
+
+
+ <!--new line : "&#10;"-->

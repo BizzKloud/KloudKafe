@@ -41,12 +41,12 @@ public class MenuFragment extends Fragment {
 
     View view;
 
-    LinearLayout dotsLayout;
-    ImageView [] dots;
+    public static LinearLayout dotsLayout;
+    public static ImageView [] dots;
     ViewPager whatsNewViewPager;
-    WhatsNewSliderAdapter whatsNewSliderAdapter;
+    public static WhatsNewSliderAdapter whatsNewSliderAdapter;
+    public static RecyclerViewAdapterVendorList recyclerViewAdapterVendorList;
     RecyclerView recyclerviewVendorList;
-    ProgressBar progressBar;
 
     public static int position = 0;
     int whatsNewTimer;
@@ -60,8 +60,6 @@ public class MenuFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        gestureDetector = new GestureDetector(getContext(), new SwipeListener());
     }
 
     @Nullable
@@ -69,9 +67,6 @@ public class MenuFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.menu_fragment, container, false);
-
-        progressBar = view.findViewById(R.id.progressBar);
-//        imageSwitcherWhatsNew = view.findViewById(R.id.whatsNew);
 
 
         // WhatsNew List
@@ -92,10 +87,9 @@ public class MenuFragment extends Fragment {
 
         // Vendor List
         recyclerviewVendorList = view.findViewById(R.id.recyclerviewVendorList);
-        RecyclerViewAdapterVendorList recyclerViewAdapterVendorList = new RecyclerViewAdapterVendorList(getContext());
+        recyclerViewAdapterVendorList = new RecyclerViewAdapterVendorList(getContext());
         recyclerviewVendorList.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerviewVendorList.setAdapter(recyclerViewAdapterVendorList);
-
 
 
         return view;
@@ -112,6 +106,7 @@ public class MenuFragment extends Fragment {
             if (!runnableRunning) {
                 position = 0;
                 whatsNewViewPager.setCurrentItem(position);
+                setDotsLayout(0);
                 whatsNewTimer = Integer.parseInt(Home.whatsNewArr.get(position).get("time").toString()) * 1000;
                 handler.postDelayed(runnable, 0);
             }
@@ -135,7 +130,6 @@ public class MenuFragment extends Fragment {
                 Log.i("MENU Position CHANGED" , String.valueOf(position) );
 
             }
-
             if(!cancelled) {
                 Log.i("Runnable WhatsNew", "NOt Cancelled");
                 runnableRunning = true;
@@ -154,8 +148,7 @@ public class MenuFragment extends Fragment {
     // ViewPager Listener
     ViewPager.OnPageChangeListener viewListener = new ViewPager.OnPageChangeListener() {
         @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        }
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
 
         @Override
         public void onPageSelected(int position) {
@@ -164,17 +157,8 @@ public class MenuFragment extends Fragment {
         }
 
         @Override
-        public void onPageScrollStateChanged(int state) {
-
-        }
+        public void onPageScrollStateChanged(int state) { }
     };
-
-
-
-//    public void addtocartWhatsnewButton (View view) {
-//        Log.i("Button Clicked" , "ADD to Cart");
-//
-//    }
 
 
 
@@ -190,8 +174,22 @@ public class MenuFragment extends Fragment {
 
         dots[pos].setImageResource(R.drawable.smallcirclewhite);
     }
+    public void setDotsLayout(int pos, Context context) {
+
+        dotsLayout.removeAllViews();
+//        Log.i("WhatsNew Array" , (String.valueOf(Home.whatsNewArr.size())) );
+        for(int i=0; i<Home.whatsNewArr.size(); i++) {
+            dots[i] = new ImageView(context);
+            dots[i].setImageResource(R.drawable.smallcirclegrey);
+            dotsLayout.addView(dots[i]);
+        }
+        dots[pos].setImageResource(R.drawable.smallcirclewhite);
+    }
 
 
 
-
+//    @Override
+//    public Context getContext() {
+//        return super.getContext();
+//    }
 }

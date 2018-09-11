@@ -2,8 +2,21 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name= "vendor_name">24sp</dimen>
-    <dimen name= "fooditem_name_menu">28sp</dimen>
-    <dimen name= "fooditem_sdesp_menu">20sp</dimen>
+    <dimen name= "actionbar_title">24sp</dimen>
+    <dimen name= "vendor_name_cart">24sp</dimen>
+    <dimen name= "vendor_name_card">24sp</dimen>
+    <dimen name= "fooditem_name_cart">22sp</dimen>
+    <dimen name= "fooditem_amount_cart">20sp</dimen>
+    <dimen name= "vendor_tax_amount_cart">18sp</dimen>
+    <dimen name= "vendor_subtotal_amount_cart">20sp</dimen>
+    <dimen name= "vendor_grandtotal_amount_cart">22sp</dimen>
+    <dimen name= "ymal_fooditem_name">16sp</dimen>
+    <dimen name= "ymal_title">12sp</dimen>
+    <dimen name= "continue_ordering">28sp</dimen>
+    <dimen name= "pay_now">32sp</dimen>
+    <dimen name= "ihf_cart">20sp</dimen>
+    <dimen name= "taxbreakup_label_and_amount">20sp</dimen>
+    <dimen name= "fooditem_name_menu">24sp</dimen>
+    <dimen name= "fooditem_sdesp_menu">22sp</dimen>
     <dimen name= "fooditem_amount_menu">22sp</dimen>
 </resources>

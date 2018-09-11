@@ -85,7 +85,7 @@ public class Login extends AppCompatActivity {
     String passcode;
     String foodcourtsPath = "foodcourts";
     String fcid;
-    String adminid;
+//    String adminid;
     String adminPath;
     String tablePath;
     int posfc;
@@ -246,11 +246,22 @@ public class Login extends AppCompatActivity {
 
     // Activate Button
     public void activate(View view) {
+
+        HashMap basicDetails = new HashMap();
+        basicDetails.put("adminId" , adminArr.get(adminSpnr.getSelectedItemPosition()).get("usrid").toString() );
+        basicDetails.put("empid" , adminArr.get(adminSpnr.getSelectedItemPosition()).get("empid").toString() );
+        basicDetails.put("displayName" , employeeArr.get(adminSpnr.getSelectedItemPosition()).get("displayName").toString()  );
+        basicDetails.put("tabid" , tableArr.get(tableSpnr.getSelectedItemPosition()).get("tabid").toString()  );
+        basicDetails.put("tableName" , tableArr.get(tableSpnr.getSelectedItemPosition()).get("name").toString()  );
+        Log.i("BASIC DETAILS" , basicDetails.toString());
+
         Intent home = new Intent(this, Home.class);
         home.putExtra("fcDetails" , foodCourtArr.get(posfc));
-        home.putExtra("adminDetails" , foodCourtArr.get(posadmin));
+        home.putExtra("adminDetails" , adminArr.get(posadmin));
         home.putExtra("employeeDetails" , employeeArr.get(posadmin));
         home.putExtra("tableDetails" , tableArr.get(postable));
+        home.putExtra("basicDetails" , basicDetails);
+
         startActivity(home);
         finish();
     }
@@ -260,9 +271,6 @@ public class Login extends AppCompatActivity {
     // Authenticate Button
     public void authenticate(View view) {
 
-
-
-//        Common.EnableProgressBar(progressBarHolder, inAnimation);
         progressDialog.setMessage("Authenticating Credentials");
         progressDialog.show();
         progressDialog.setCanceledOnTouchOutside(false);
@@ -292,7 +300,6 @@ public class Login extends AppCompatActivity {
                 linearlayoutFoodcourt.animate().translationX(1000f).alpha(0.0f).setDuration(500);
                 linearlayoutTable.animate().translationX(0f).alpha(1.0f).setDuration(500);
                 statusTable.setTextColor(ResourcesCompat.getColor(getResources(), R.color.bizzorange, null));
-//                statusFoodcourt.setTextColor(Color.parseColor("@color/grey"));
                 statusFoodcourt.setTextColor(getResources().getColor(R.color.grey));
                 imageViewCircleFd.setImageResource(R.drawable.circlegrey);
                 imageViewCircleTb.setImageResource(R.drawable.circleorange);
@@ -353,7 +360,7 @@ public class Login extends AppCompatActivity {
 
 
 
-    // Set FoodCourts/Vendor Names
+    // Set FoodCourts/Admin Names
     public ArrayList<String> setnames(ArrayList<String> names, ArrayList<HashMap> hashmapArr, Boolean label) {
         String name = names.get(0);
         names.clear();

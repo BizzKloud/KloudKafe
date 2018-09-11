@@ -4,7 +4,11 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="bizzblue">#334774</color>
+    <color name="bizzlightblue">#334774</color>
     <color name="bizzorange">#ff8800</color>
+    <color name="bizzlightorange">#ff9d2d</color>
     <color name="grey">#878787</color>
     <color name="lightgrey">#e6e6e6</color>
+    <color name="darkgrey">#606060</color>
+    <color name="rupeegreen">#328926</color>
 </resources>

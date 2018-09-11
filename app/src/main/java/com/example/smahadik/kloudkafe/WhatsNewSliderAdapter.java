@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.PagerAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +19,16 @@ import com.bumptech.glide.request.target.Target;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.StorageReference;
 
+import java.lang.reflect.Array;
+import java.util.HashMap;
+
 public class WhatsNewSliderAdapter extends PagerAdapter{
 
     Context context;
     LayoutInflater layoutInflater;
     StorageReference whatsNewStorageRef;
     FloatingActionButton addtocartWhatsNew;
+    Home home = new Home();
 
     public WhatsNewSliderAdapter(Context context) {
         this.context = context;
@@ -48,11 +53,12 @@ public class WhatsNewSliderAdapter extends PagerAdapter{
         layoutInflater = LayoutInflater.from(context);
         View view = layoutInflater.inflate(R.layout.whatsnew_image_slide, container, false);
 
+        final HashMap whatsNewFoodItemHashMap = Home.whatsNewArr.get(position);
         ImageView whatsNewImage = view.findViewById(R.id.whatsNewImage);
         final FloatingActionButton addtocartWhatsNew = view.findViewById(R.id.addtocartWhatsNew);
         final ProgressBar progressBar = view.findViewById(R.id.progressBar);
 
-        whatsNewStorageRef = Home.storageRef.child(Home.whatsNewArr.get(position).get("pic").toString());
+        whatsNewStorageRef = Home.storageRef.child(whatsNewFoodItemHashMap.get("pic").toString());
         Glide.with(whatsNewImage.getContext())
                 .using(new FirebaseImageLoader())
                 .load(whatsNewStorageRef)
@@ -69,10 +75,24 @@ public class WhatsNewSliderAdapter extends PagerAdapter{
                 })
                 .into(whatsNewImage);
 
+        if(home.checkFoodIteminCart(whatsNewFoodItemHashMap)) {
+            addtocartWhatsNew.setImageResource(R.drawable.addedtocart_icon);
+        }
+
         addtocartWhatsNew.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addtocartWhatsNew.setImageResource(R.drawable.addedtocart_icon);
+                //Add or Remove  to/from Cart
+                if(home.checkFoodIteminCart(whatsNewFoodItemHashMap)) {
+                    addtocartWhatsNew.setImageResource(R.drawable.addtocart_icon);
+                    home.removefromcart(whatsNewFoodItemHashMap);
+                }else {
+                    HashMap foodItemFound =  home.findFoodItem(whatsNewFoodItemHashMap);
+                    if(foodItemFound != null) {
+                        home.addtocart(foodItemFound);
+                        addtocartWhatsNew.setImageResource(R.drawable.addedtocart_icon);
+                    }
+                }
             }
         });
 
@@ -80,6 +100,28 @@ public class WhatsNewSliderAdapter extends PagerAdapter{
         return view;
 
     }
+
+
+//    public boolean checkFoodIteminCart(HashMap fooditem) {
+//        if(Home.cartArr.size() > 0) {
+//            for(int i=0; i<Home.cartArr.size(); i++) {
+//                if(Home.cartArr.get(i).get(0).get("venid").toString().equals(fooditem.get("venid").toString())) {
+//                    //found Venid- vendor
+//                    for(int j=0; j<Home.cartArr.get(i).size(); j++) {
+//                        if(Home.cartArr.get(i).get(j).get("fdid").toString().equals(fooditem.get("fdid").toString())
+//                                && Home.cartArr.get(i).get(j).get("catid").toString().equals(fooditem.get("catid").toString()) ) {
+//                            // found fdid- foodItem
+//                            Log.i("Food Item At WhatsNew" , "FOUND");
+//                            return true;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        Log.i("Food Item At WhatsNew" , "NOT FOUND");
+//        return false;
+//    }
+
 
     @Override
     public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {

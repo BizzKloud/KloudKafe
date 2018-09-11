@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="5dp"
+    android:layout_marginTop="1dp"
+    android:layout_marginBottom="1dp"
+    android:elevation="5dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textViewCartVendorNameTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:text="SOUTH BOMBAY"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/vendor_name_cart" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerviewFoodItemListCart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="7dp"
+            android:layout_marginBottom="10dp"
+            android:gravity="end"
+            android:weightSum="5">
+
+            <LinearLayout
+                android:id="@+id/vendorTax"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.1"
+                android:orientation="horizontal" >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textViewVendorTaxLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:text="TAX"
+                        android:textColor="@color/grey"
+                        android:textSize="@dimen/vendor_tax_amount_cart" />
+
+                    <View
+                        android:layout_width="38dp"
+                        android:layout_height="2dp"
+                        android:background="@color/bizzorange"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/textViewVendorTax"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="$ 99,99,999.00"
+                    android:layout_marginStart="7dp"
+                    android:textColor="@color/grey"
+                    android:textSize="@dimen/vendor_tax_amount_cart"
+                    />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.7"
+                android:orientation="horizontal"
+                android:layout_marginStart="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SUBTOTAL"
+                    android:textColor="@color/rupeegreen"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/vendor_subtotal_amount_cart"/>
+
+                <TextView
+                    android:id="@+id/textViewVendorSubTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:textStyle="bold"
+                    android:text="$ 99,99,999.00"
+                    android:layout_marginStart="7dp"
+                    android:textColor="@color/rupeegreen"
+                    android:textSize="@dimen/vendor_subtotal_amount_cart"
+                    />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</android.support.v7.widget.CardView>

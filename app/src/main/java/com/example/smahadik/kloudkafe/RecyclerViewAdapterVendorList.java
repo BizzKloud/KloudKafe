@@ -73,11 +73,11 @@ public class RecyclerViewAdapterVendorList extends RecyclerView.Adapter<Recycler
             @Override
             public void onClick(View v) {
                 Home.vendorPosition = position;
+                Home.lastVendorPosition = position;
                 Home.ft = Home.fragmentManager.beginTransaction();
                 Fragment fragment  =  new VendorItemListFragment();
                 Home.ft.replace(R.id.rootLayout,fragment , fragment.getClass().getName());
                 Home.ft.addToBackStack(null);
-
                 Home.ft.commit();
             }
         });
