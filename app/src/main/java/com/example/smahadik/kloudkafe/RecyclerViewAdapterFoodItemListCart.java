@@ -32,7 +32,7 @@ public class RecyclerViewAdapterFoodItemListCart extends RecyclerView.Adapter<Re
     View view;
     LayoutInflater layoutInflater;
     Home home = new Home();
-    CartFragment cartFragment = new CartFragment();
+    private CartFragment cartFragment = new CartFragment();
 
 
     public RecyclerViewAdapterFoodItemListCart (Context context, int pos) {

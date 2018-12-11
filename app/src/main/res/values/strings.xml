@@ -9,11 +9,16 @@
     <string name="ihf_breakup">IHF Breakup</string>
     <string name="internet_handling_fee">Internet Handling Fee</string>
     <string name="continue_ordering">CONTINUE\nORDERING</string>
-    <string name="pay_now">PAY NOW\n$ 99,99,99,999.99</string>
+    <string name="pay_now">PAY NOW\n\u20B9 99,99,99,999.99</string>
     <string name="you">Y\nO\nU</string>
     <string name="may">M\nA\nY</string>
     <string name="also">A\nL\nS\nO</string>
     <string name="like">L\nI\nK\nE</string>
+    <string name="pay_paymode">Pay ₹.</string>
+    <string name="delivery_charges">Table Delivery Charges</string>
+    <string name="text_delivery">* Select to get food delivered to your Table</string>
+    <string name="table_delivery_charge_rupees">+ \u20B9 0.00</string>
+    <string name="select_payment_method">SELECT A PAYMENT METHOD</string>
 </resources>
 
 

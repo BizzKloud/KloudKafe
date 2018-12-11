@@ -2,8 +2,11 @@ package com.example.smahadik.kloudkafe;
 
 import android.app.Dialog;
 import android.app.Fragment;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.hardware.display.DisplayManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +21,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+
+import java.util.Calendar;
 import java.util.HashMap;
 
 public class CartFragment extends Fragment {
@@ -28,6 +37,10 @@ public class CartFragment extends Fragment {
     RecyclerView ymalRecyclerview;
     TextView textViewBaseAmountIHFTaxPopup;
     TextView textViewTotalTaxIHFTaxPopup;
+    TextView payModeTitleAmountTextView;
+    TextView textViewTotalPayMode;
+    Button closePayModeButton;
+    Button cashButton;
     LinearLayout ihfFCTax;
     LinearLayout continueOrderingButton;
 
@@ -37,8 +50,13 @@ public class CartFragment extends Fragment {
     public static RecyclerViewAdapterCartVendorList recyclerViewAdapterCartVendorList;
     public static RecyclerViewAdapterYmalList recyclerViewAdapterYmalList;
     Dialog iHFPopUp;
+    Dialog payModePopUp;
 
-//    Home home = new Home();
+    DocumentReference placeOrderDbRef;
+    int lenOrderId;
+    String newOrderId;
+    String venOrderId;
+    String [] venIdArr;
 
 
     @Override
@@ -46,6 +64,8 @@ public class CartFragment extends Fragment {
         super.onCreate(savedInstanceState);
         iHFPopUp = new Dialog(getContext());
         iHFPopUp.setCanceledOnTouchOutside(true);
+        payModePopUp = new Dialog(getContext());
+        payModePopUp.setCanceledOnTouchOutside(false);
     }
 
 
@@ -66,7 +86,6 @@ public class CartFragment extends Fragment {
         ymalRecyclerview.setAdapter(recyclerViewAdapterYmalList);
 
 
-
         textViewIHFPer = view.findViewById(R.id.textViewIHFPer);
         textViewGrandTotal = view.findViewById(R.id.textViewGrandTotal);
         ihfFCTax = view.findViewById(R.id.ihfFC);
@@ -76,14 +95,23 @@ public class CartFragment extends Fragment {
         ihfFCTax.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(Home.cartArr.size() > 0) { showPopUp(); }
+                if(Home.cartArr.size() > 0) { showPopUpIHF(); }
             }
         });
+
+
+        paynowButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(Home.cartArr.size() > 0) { showPopUpPayMode(); }
+            }
+        });
+
         continueOrderingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // continue ordering
-                Log.i("Continue Ordering" , "vendor POS: " + Home.lastVendorPosition );
+//                Log.i("Continue Ordering" , "vendor POS: " + Home.lastVendorPosition );
                 if (Home.navigation.getSelectedItemId() == R.id.navigation_menu) {
                     VendorItemListFragment.drawerLayout.closeDrawer(Gravity.END);
                 }
@@ -111,7 +139,7 @@ public class CartFragment extends Fragment {
         return view;
     }
 
-    public void showPopUp() {
+    public void showPopUpIHF() {
         iHFPopUp.setContentView(R.layout.ihf_tax_breakup_popup);
 
         recyclerviewIHFTaxPopUp = iHFPopUp.findViewById(R.id.recyclerviewIHFTaxPopUp);
@@ -124,14 +152,135 @@ public class CartFragment extends Fragment {
         textViewBaseAmountIHFTaxPopup.setText(Home.currencyFc + Home.formatter.format(Home.orderDetails.get("iHFBaseAmount")));
         textViewTotalTaxIHFTaxPopup.setText(Home.currencyFc + Home.formatter.format(Home.orderDetails.get("iHFTotalAmount")));
 
+        iHFPopUp.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         iHFPopUp.show();
     }
+
+
+    public void showPopUpPayMode() {
+        payModePopUp.setContentView(R.layout.pay_mode_card);
+
+        payModeTitleAmountTextView = payModePopUp.findViewById(R.id.payModeTitleAmountTextView);
+        textViewTotalPayMode = payModePopUp.findViewById(R.id.textViewTotalPayMode);
+        closePayModeButton = payModePopUp.findViewById(R.id.closePayModeButton);
+        cashButton = payModePopUp.findViewById(R.id.cashButton);
+        payModeTitleAmountTextView.setText(Home.formatter.format(Home.orderDetails.get("grandTotal")));
+        textViewTotalPayMode.setText(Home.currencyFc + Home.formatter.format(Home.orderDetails.get("grandTotal")));
+
+        closePayModeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                payModePopUp.dismiss();
+            }
+        });
+        cashButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getOrderId();
+            }
+        });
+
+        payModePopUp.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        payModePopUp.show();
+    }
+
 
     public void setPayNow() {
         String paynowText = "PAY NOW" + "\n" +  Home.currencyFc + Home.formatter.format(Home.orderDetails.get("grandTotal"));
         paynowButton.setText(paynowText);
     }
 
+    public void placeOrder() {
+
+        placeOrderDbRef = Home.dbTransaction.document(Home.todaysDate).collection(Home.orderId).document("Total");
+        Log.i("cart Array" , Home.cartArr.toString());
+        Log.i("cart Vendor Array" , Home.cartVendorArr.toString());
+        Log.i("cart vendor tax Array" , Home.cartVendorTaxArr.toString());
+        Log.i("cart FC tax Array" , Home.cartFCTaxArr.toString());
+        Log.i("cart order details Array" , Home.orderDetails.toString());
+
+        placeOrderDbRef.set(Home.orderDetails);
+
+        for (int i=0; i<Home.cartVendorArr.size(); i++) {
+            venIdArr = Home.cartVendorArr.get(i).get("venid").toString().split("_");
+            venOrderId = Home.orderId + "_" +  venIdArr[4];
+            Home.cartVendorArr.get(i).put("orderId" , venOrderId);
+            placeOrderDbRef = Home.dbTransaction.document(Home.todaysDate).collection(Home.orderId).document(venOrderId);
+            placeOrderDbRef.set(Home.cartVendorArr.get(i));
+        }
+
+        for (int i=0; i<Home.cartVendorArr.size(); i++) {
+            for (int j=0; j<Home.cartArr.get(i).size(); j++) {
+                placeOrderDbRef = Home.dbTransaction.document(Home.todaysDate).collection(Home.orderId)
+                        .document(Home.cartVendorArr.get(i).get("orderId") + "/FoodItems/" + j);
+                placeOrderDbRef.set(Home.cartArr.get(i).get(j));
+            }
+
+            for (int j=0; j<Home.cartVendorTaxArr.get(i).size(); j++) {
+                placeOrderDbRef = Home.dbTransaction.document(Home.todaysDate).collection(Home.orderId)
+                        .document(Home.cartVendorArr.get(i).get("orderId") + "/VendorTax/" + j);
+                placeOrderDbRef.set(Home.cartVendorTaxArr.get(i).get(j));
+            }
+        }
+        if(Home.freebieArr.size() > 0) {
+            placeOrderDbRef = Home.dbTransaction.document(Home.todaysDate).collection(Home.orderId).document("Freebie");
+            placeOrderDbRef.set(Home.freebieArr.get(0));
+            placeOrderDbRef = Home.db.document(Home.fcDetails.get("fcid").toString() + "/FreebieM/" + Home.freebieArr.get(0).get("frb_id"));
+            placeOrderDbRef.update("frb_id" , Integer.parseInt(Home.freebieArr.get(0).get("count").toString())-1);
+        }
+
+        for (int i=0; i<Home.cartFCTaxArr.size(); i++) {
+            placeOrderDbRef = Home.dbTransaction.document(Home.todaysDate).collection(Home.orderId).document("Tax_Fcm/FoodCourtTax/" + i);
+            placeOrderDbRef.set(Home.cartFCTaxArr.get(i));
+        }
+//        Home.home.clearcart();
+        Home.orderPlaced = true;
+        payModePopUp.dismiss();
+
+        // GOTO ORDERS PAGE
+        Home.navigation.setSelectedItemId(R.id.navigation_order);
+//        Home.ft = Home.fragmentManager.beginTransaction();
+//        Home.ft.replace(R.id.rootLayout, new OrdersPageFragment());
+//        Home.ft.commit();
+    }
+
+
+    public String getOrderId() {
+
+        //OrderID
+        Home.firestore.collection("transactions").document(Home.fcDetails.get("fcid").toString()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    DocumentReference dbref = Home.firestore.document("transactions/" + Home.fcDetails.get("fcid").toString());
+                    if (document.exists()) {
+                        Log.i("Doc exists" , "DocumentSnapshot data: " + document.getData());
+                        Home.orderId = document.get("orderId").toString();
+                    } else {
+                        Log.i("Doc not exists " ,"Doc Created");
+                        dbref.set(Home.fcDetails);
+                        Home.orderId = "000000001";
+                    }
+                    Home.orderDetails.put("orderId" , Home.orderId);
+                    Home.orderDetails.put("time" , Calendar.getInstance().getTime());
+                    newOrderId = String.valueOf(Integer.parseInt(Home.orderId)+1);
+                    lenOrderId = newOrderId.length();
+                    for (int i=0; i< 9-lenOrderId; i++) {
+                        newOrderId = "0" + newOrderId;
+                    }
+                    dbref.update("orderId" , newOrderId );
+                    Home.progressDialog.setMessage("Placing Your Order");
+                    Home.progressDialog.show();
+                    placeOrder();
+                } else {
+                    Log.i("Doc not exists --  ERROR " , "No such document");
+                    Toast.makeText(getContext(), "ERROR getting ORDER-ID", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        return Home.orderId;
+    }
 
     public void notifyForUpdates() {
         recyclerViewAdapterCartVendorList.notifyDataSetChanged();

@@ -27,7 +27,6 @@ import java.util.List;
 
 public class VendorItemListFragment extends Fragment{
 
-
     View view;
     public static ViewPager foodItemListViewPager;
     public static TabLayout categoryTabs;
@@ -54,6 +53,11 @@ public class VendorItemListFragment extends Fragment{
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.vendor_item_list_fragment, container, false);
@@ -64,6 +68,7 @@ public class VendorItemListFragment extends Fragment{
         textViewvendorNameTitle = toolbar.findViewById(R.id.textViewvendorNameTitle);
         drawerLayout = view.findViewById(R.id.drawerLayout);
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        Log.i("Called again" , "TRUE");
 
         textViewvendorNameTitle.setText(Home.vendorArr.get(Home.vendorPosition).get("name").toString());
 
@@ -102,7 +107,19 @@ public class VendorItemListFragment extends Fragment{
                 lastvenpos = Home.lastVendorPosition;
                 Log.i("Called Opened", String.valueOf(lastvenpos) );
                 Home.catPosition = foodItemListViewPager.getCurrentItem();
-
+//                Home.fragmentManager = getFragmentManager();
+//                Home.ft = Home.fragmentManager.beginTransaction();
+//                if(Home.flagCartFirst) {
+//                    Log.i("Flag CART FIRST " ,  "Flag CART FIRST = TRUE");
+//                    Home.ft.replace(R.id.cartDrawerFrameLayout, new CartFragment(), CartFragment.class.getName()+"1");
+//                    Home.ft.addToBackStack(null);
+//                    Log.i("BACKSTACK ENTRY LIST", String.valueOf(getFragmentManager().getBackStackEntryCount()));
+//                    Home.flagCartFirst = false;
+//                } else {
+//                    Log.i("Flag CART SECOND " ,  "Flag CART SECOND = TRUE");
+//                    Home.ft.replace(R.id.cartDrawerFrameLayout, Home.fragmentManager.findFragmentByTag(CartFragment.class.getName()+"1"));
+//                }
+//                Home.ft.commit();
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction ft = fragmentManager.beginTransaction();
                 ft.replace(R.id.cartDrawerFrameLayout, new CartFragment());
@@ -113,12 +130,13 @@ public class VendorItemListFragment extends Fragment{
 
             @Override
             public void onDrawerClosed(View drawerView) {
-                Home.progressDialog.setMessage("Loading Your Cart");
+                Home.progressDialog.setMessage("Loading Menu");
                 Home.progressDialog.show();
                 Home.vendorPosition = lastvenpos;
                 Home.lastVendorPosition = lastvenpos;
                 setupViewPager();
                 foodItemListViewPager.setCurrentItem(Home.catPosition);
+
                 Log.i("Called Closed", String.valueOf(lastvenpos) );
                 Log.i("Called Closed cat", String.valueOf(Home.catPosition) );
                 Home.progressDialog.dismiss();
@@ -130,35 +148,16 @@ public class VendorItemListFragment extends Fragment{
         foodItemListViewPager = (ViewPager) view.findViewById(R.id.foodItemListViewPager);
 //        foodItemListViewPager.addOnPageChangeListener(viewListener);
         setupViewPager();
-
-        categoryTabs = (TabLayout) view.findViewById(R.id.categoryTabs);
-        categoryTabs.setupWithViewPager(foodItemListViewPager);
         return view;
     }
-
-
-    // ViewPager Listener
-//    ViewPager.OnPageChangeListener viewListener = new ViewPager.OnPageChangeListener() {
-//        @Override
-//        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-//        }
-//
-//        @Override
-//        public void onPageSelected(int position) {
-//            Home.catPosition = position;
-//        }
-//
-//        @Override
-//        public void onPageScrollStateChanged(int state) {
-//
-//        }
-//    };
 
 
 
     private void setupViewPager() {
         categorySliderAdapter = new CategorySliderAdapter(getContext());
         foodItemListViewPager.setAdapter(categorySliderAdapter);
+        categoryTabs = (TabLayout) view.findViewById(R.id.categoryTabs);
+        categoryTabs.setupWithViewPager(foodItemListViewPager);
     }
 
 

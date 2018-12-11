@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -35,7 +36,11 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -49,7 +54,9 @@ import com.google.firebase.storage.StorageReference;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Timer;
@@ -63,6 +70,7 @@ public class Home extends AppCompatActivity {
 
     public static FirebaseFirestore firestore;
     public static CollectionReference db;
+    public static CollectionReference dbTransaction;
     public static StorageReference storageRef;
     CollectionReference vendorItemRef;
     CollectionReference vendorTaxRef;
@@ -79,7 +87,8 @@ public class Home extends AppCompatActivity {
     public static DecimalFormat formatter = new DecimalFormat("##,##,##,##0.00");
     public static DecimalFormat decimalFormatter = new DecimalFormat("####0.00");
     public static DecimalFormat removedecimalFormatter = new DecimalFormat("#####");
-
+    public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+    public static String todaysDate = simpleDateFormat.format(Calendar.getInstance().getTime());
 
 
     public static BottomNavigationView navigation;
@@ -100,9 +109,11 @@ public class Home extends AppCompatActivity {
     //Home Initials
     CartFragment cartFragment = new CartFragment();
     public static Home home = new Home();
+    public static OrdersPageFragment ordersPageFragment = new OrdersPageFragment();
     public static ArrayList<HashMap> advertisementArr;
     public static ArrayList<HashMap> whatsNewArr;
     public static ArrayList<HashMap> ymalArr;
+    public static ArrayList<HashMap> freebieArr;
     public static ArrayList<HashMap> vendorArr;
     public static ArrayList<ArrayList <HashMap>> categoryArr;
     public static ArrayList<ArrayList <HashMap>> vendorTaxArr;
@@ -112,10 +123,15 @@ public class Home extends AppCompatActivity {
     public static ArrayList<ArrayList<HashMap>> cartArr;
     public static ArrayList<ArrayList <HashMap>> cartVendorTaxArr;
     public static ArrayList<HashMap> cartVendorArr;
+    public static ArrayList<String> orderIdArr = new ArrayList<>();
+    public static ArrayList<ArrayList <HashMap>> orderVendorArr = new ArrayList<>();
+    public static ArrayList<ArrayList<ArrayList <HashMap>>> orderFoodItemArr = new ArrayList<>();
     public static int vendorPosition;
     public static int catPosition;
     public static int lastVendorPosition;
     public static String currencyFc;
+    public static String orderId;
+    public static Boolean orderPlaced = false;
 
 
     // Asysny Initials
@@ -123,6 +139,10 @@ public class Home extends AppCompatActivity {
     int venindex = -1;
     int vendorTaxindex = -1;
     Boolean firstTimeCat = true;
+
+
+    public static int width;
+    DisplayMetrics metrics = new DisplayMetrics();
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -167,10 +187,8 @@ public class Home extends AppCompatActivity {
                     }
                     return true;
                 case R.id.navigation_order:
-                    if(navigation.getSelectedItemId() != R.id.navigation_order) {
-                        stopImageSwitcher(true, true);
-                        return true;
-                    }
+                    pushOrdersFrag();
+                    return true;
             }
             return false;
         }
@@ -186,9 +204,11 @@ public class Home extends AppCompatActivity {
 //        getSupportActionBar().hide();
 //        advFrag = new AdvertisementFragment();
 
-
         fragmentManager = getFragmentManager();
         ft = fragmentManager.beginTransaction();
+
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        width = metrics.widthPixels;
 
 
         // FIRESTORE
@@ -200,6 +220,9 @@ public class Home extends AppCompatActivity {
         // INITIALIZATION
         login = getIntent();
         progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Setting Up Your App");
+        progressDialog.show();
+        progressDialog.setCanceledOnTouchOutside(false);
 
         fcDetails = (HashMap) login.getSerializableExtra("fcDetails");
         adminDetails = (HashMap) login.getSerializableExtra("adminDetails");
@@ -213,6 +236,7 @@ public class Home extends AppCompatActivity {
         basicDetails.put("grandTotal" , 0);
         menuInit();
         cartInit();
+        dbTransaction = firestore.collection("transactions/" + fcDetails.get("fcid") + "/orders");
 
         currencyFc = fcDetails.get("curky").toString();
         if(currencyFc.equals("INR")) {
@@ -221,9 +245,6 @@ public class Home extends AppCompatActivity {
 
 
         // Asysnc Task Start
-        progressDialog.setMessage("Setting Up Your App");
-        progressDialog.show();
-        progressDialog.setCanceledOnTouchOutside(false);
         new AsysncTask().execute();
         new CountDownTimer(7500, 1000) {
             public void onTick(long millisUntilFinished) { }
@@ -284,8 +305,8 @@ public class Home extends AppCompatActivity {
                     Log.i("BACKSTACK ENTRY LIST", String.valueOf(getFragmentManager().getBackStackEntryCount()));
 //                    ft.replace(R.id.rootLayout, fragment);
 //                    if(flagAdvFirst) {
-                        Log.i("Calling Commit", "TRUEEEEEE");
-                        ft.commit();
+                    Log.i("Calling Commit", "TRUEEEEEE");
+                    ft.commit();
 //                    }
 
                 }
@@ -320,6 +341,23 @@ public class Home extends AppCompatActivity {
             setCounter();
         }
     }
+
+    public void pushOrdersFrag() {
+        if(navigation.getSelectedItemId() != R.id.navigation_order) {
+            stopImageSwitcher(true, true);
+            if(flagOrderFirst) {
+                Log.i("Flag ORDER FIRST " ,  "Flag ORDER FIRST = TRUE");
+                Log.i("Navigation " ,  "Changed");
+                pushFragment(new OrdersPageFragment(), flagOrderFirst);
+                flagOrderFirst = false;
+            } else {
+                Log.i("Flag ORDER SECOND " ,  "Flag ORDER SECOND = FALSE");
+                pushFragment(new OrdersPageFragment(), flagOrderFirst);
+            }
+            setCounter();
+        }
+    }
+
 
 
     public void stopImageSwitcher(boolean advCancelled, boolean menuCancelled) {
@@ -361,6 +399,7 @@ public class Home extends AppCompatActivity {
         cartVendorTaxArr = new ArrayList<>();
         cartFCTaxArr = new ArrayList<>();
         fcTaxArr = new ArrayList<>();
+        freebieArr = new ArrayList<>();
         orderDetails = basicDetails;
     }
 
@@ -467,7 +506,8 @@ public class Home extends AppCompatActivity {
         HashMap newVendorArrayList = vendorArr.get(pos);
 
         newVendorArrayList.put("orderStatus", "Not Created" );
-        String[] oHStatus = {"Hello" , "Nothing"};
+        ArrayList<String> oHStatus = new ArrayList<>();
+        oHStatus.add("Placed");
         newVendorArrayList.put("oHStatus", oHStatus );
         newVendorArrayList.put("orderId", 00 );
         newVendorArrayList.put("baseAmount", 00 );
@@ -543,6 +583,8 @@ public class Home extends AppCompatActivity {
             orderDetails.put("iHFtax" , totalTaxAmount );
             orderDetails.put("iHFTotalAmount" , Double.parseDouble(decimalFormatter.format(totalTaxAmount + baseAmount)) );
             orderDetails.put("grandTotal" , Double.parseDouble(decimalFormatter.format(Double.parseDouble(orderDetails.get("baseAmount").toString()) + totalTaxAmount + baseAmount)) );
+            orderDetails.put("modeOfPay" , "CASH" );
+            orderDetails.put("finalOrderStatus" , "CREATED" );
 //        }
 
         if(CartFragment.textViewIHFPer != null) {
@@ -769,15 +811,28 @@ public class Home extends AppCompatActivity {
                         ymalArr.add( (HashMap) ymalItem.getData());
                         Log.i("YMAL Array" , ymalArr.toString());
                     }
-//                    if(MenuFragment.whatsNewSliderAdapter != null) {
-////                            Log.i("YMAL Array" , (String.valueOf(ymal.size())) );
-//                        MenuFragment.whatsNewSliderAdapter.notifyDataSetChanged();
-//                        MenuFragment menuFragment = new MenuFragment();
-//                        menuFragment.setDotsLayout(0, getApplicationContext());
-//                    }
+                    if(MenuFragment.whatsNewSliderAdapter != null) {
+                        MenuFragment.whatsNewSliderAdapter.notifyDataSetChanged();
+                    }
                 }
             });
 
+
+            //Freebie Array
+            db.document(fcDetails.get("fcid").toString()).collection("FreebieM").whereEqualTo("status", true).orderBy("name", Query.Direction.ASCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
+                @Override
+                public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                    freebieArr.clear();
+                    for(QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        int count = Integer.parseInt(document.get("count").toString());
+                        if(count > 0) {
+                            freebieArr.add( (HashMap) document.getData());
+                        }
+                        Log.i("Freebie Array" , freebieArr.toString());
+                    }
+                    notifyforupdates();
+                }
+            });
 
 
             return null;

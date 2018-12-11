@@ -1,9 +1,12 @@
 package com.example.smahadik.kloudkafe;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.media.Image;
 import android.support.annotation.NonNull;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
@@ -36,7 +39,6 @@ public class RecyclerViewAdapterFoodItemList extends RecyclerView.Adapter<Recycl
     View view;
     StorageReference fooditemStorageRef;
     Home home = new Home();
-    CartFragment cartFragment = new CartFragment();
 
 
     public RecyclerViewAdapterFoodItemList (Context context, int catpos) {
@@ -100,25 +102,44 @@ public class RecyclerViewAdapterFoodItemList extends RecyclerView.Adapter<Recycl
             }
         });
 
+        holder.imageViewFoodItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showEnlargeImage(foodItemHashMap);
+            }
+        });
+
     }
 
-//    public boolean checkFoodIteminCart(HashMap fooditem) {
-//        if(Home.cartArr.size() > 0) {
-//            for(int i=0; i<Home.cartArr.size(); i++) {
-//                if(Home.cartArr.get(i).get(0).get("venid").toString().equals(fooditem.get("venid").toString())) {
-//                    //found Venid- vendor
-//                    for(int j=0; j<Home.cartArr.get(i).size(); j++) {
-//                        if(Home.cartArr.get(i).get(j).get("fdid").toString().equals(fooditem.get("fdid").toString())
-//                                && Home.cartArr.get(i).get(j).get("catid").toString().equals(fooditem.get("catid").toString()) ) {
-//                            // found fdid- foodItem
-//                            return true;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return false;
-//    }
+
+    public void showEnlargeImage(HashMap foodItemHashMap) {
+        Dialog imageEnlargeDialog = new Dialog(context);
+        imageEnlargeDialog.setContentView(R.layout.image_enlarge_cardview);
+
+        ImageView imageViewEnlargeImage = imageEnlargeDialog.findViewById(R.id.imageViewEnlargeImage);
+        TextView textViewEnlargeImage = imageEnlargeDialog.findViewById(R.id.textViewEnlargeImage);
+        final ProgressBar progressBarEnlargeImage = imageEnlargeDialog.findViewById(R.id.progressBarEnlargeImage);
+
+        fooditemStorageRef = Home.storageRef.child(foodItemHashMap.get("pic").toString());
+        Glide.with(imageViewEnlargeImage.getContext())
+                .using(new FirebaseImageLoader())
+                .load(fooditemStorageRef)
+                .listener(new RequestListener<StorageReference, GlideDrawable>() {
+                    @Override
+                    public boolean onException(Exception e, StorageReference model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        return false;
+                    }
+                    @Override
+                    public boolean onResourceReady(GlideDrawable resource, StorageReference model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        progressBarEnlargeImage.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
+                .into(imageViewEnlargeImage);
+        textViewEnlargeImage.setText(foodItemHashMap.get("name").toString());
+
+        imageEnlargeDialog.show();
+    }
 
     @Override
     public int getItemCount() {

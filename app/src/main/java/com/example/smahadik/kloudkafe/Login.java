@@ -28,7 +28,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -91,6 +96,7 @@ public class Login extends AppCompatActivity {
     int posfc;
     int posadmin;
     int postable;
+    FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
 
 
@@ -247,13 +253,16 @@ public class Login extends AppCompatActivity {
     // Activate Button
     public void activate(View view) {
 
+        FirebaseUser user = mAuth.getCurrentUser();
+        signInAnonymously();
+
+
         HashMap basicDetails = new HashMap();
-        basicDetails.put("adminId" , adminArr.get(adminSpnr.getSelectedItemPosition()).get("usrid").toString() );
-        basicDetails.put("empid" , adminArr.get(adminSpnr.getSelectedItemPosition()).get("empid").toString() );
-        basicDetails.put("displayName" , employeeArr.get(adminSpnr.getSelectedItemPosition()).get("displayName").toString()  );
-        basicDetails.put("tabid" , tableArr.get(tableSpnr.getSelectedItemPosition()).get("tabid").toString()  );
-        basicDetails.put("tableName" , tableArr.get(tableSpnr.getSelectedItemPosition()).get("name").toString()  );
-        Log.i("BASIC DETAILS" , basicDetails.toString());
+        basicDetails.put("adminId" , adminArr.get(adminSpnr.getSelectedItemPosition()-1).get("usrid").toString() );
+        basicDetails.put("empid" , adminArr.get(adminSpnr.getSelectedItemPosition()-1).get("empid").toString() );
+        basicDetails.put("displayName" , employeeArr.get(adminSpnr.getSelectedItemPosition()-1).get("displayName").toString()  );
+        basicDetails.put("tabid" , tableArr.get(tableSpnr.getSelectedItemPosition()-1).get("tabid").toString()  );
+        basicDetails.put("tableName" , tableArr.get(tableSpnr.getSelectedItemPosition()-1).get("name").toString()  );
 
         Intent home = new Intent(this, Home.class);
         home.putExtra("fcDetails" , foodCourtArr.get(posfc));
@@ -266,6 +275,21 @@ public class Login extends AppCompatActivity {
         finish();
     }
 
+    private void signInAnonymously() {
+        mAuth.signInAnonymously()
+                .addOnSuccessListener(this, new  OnSuccessListener<AuthResult>() {
+            @Override
+            public void onSuccess(AuthResult authResult) {
+                Log.i("signInAnonymously: SUCCESS ", "TRUE");
+            }
+        })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        Log.i("signInAnonymously:FAILURE", exception.toString());
+                    }
+        });
+    }
 
 
     // Authenticate Button
@@ -334,9 +358,10 @@ public class Login extends AppCompatActivity {
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     if(task.isSuccessful()) {
                         HashMap check = (HashMap) task.getResult().getData();
+                        Log.i("CHECK TABLE STATUS" , check.get("status").toString());
                         if(!(Boolean) check.get("status")) {
                             DocumentReference currentTable = db.document(path);
-//                            currentTable.update("status", true);
+//                            currentTable.update("status", true); add on sucess listner
                             progressDialog.dismiss();
 
                             // Change UI to Table
@@ -352,6 +377,10 @@ public class Login extends AppCompatActivity {
                             imageViewCircleTb.setImageResource(R.drawable.circlegrey);
                             imageViewCircleActivate.setImageResource(R.drawable.circleorange);
                         }
+                    }
+                    else {
+                        Toast.makeText(Login.this, "ERROR LOGING IN.", Toast.LENGTH_SHORT).show();
+                        Log.i("CHECK TABLE STATUS" , "FAILED to check");
                     }
                 }
             });
