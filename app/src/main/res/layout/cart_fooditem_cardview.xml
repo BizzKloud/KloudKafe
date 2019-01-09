@@ -45,7 +45,7 @@
             android:id="@+id/textViewFoodItemNameCart"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="9.6"
+            android:layout_weight="9.55"
             android:text="Szechwan Momo Veg/Chicken"
             android:layout_marginLeft="7dp"
             android:layout_gravity="center_vertical"
@@ -56,10 +56,11 @@
             android:id="@+id/textViewFoodItemAmountCart"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="3.8"
+            android:layout_weight="3.85"
             android:layout_marginLeft="7dp"
-            android:text="$ 99,999.00"
-            android:textColor="@color/rupeegreen"
+            android:text="$ 9,99,999.00"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
             android:layout_gravity="center_vertical"
             android:textSize="@dimen/fooditem_amount_cart"/>
 

@@ -118,18 +118,23 @@ public class ExpandableListAdapterOrdersList extends BaseExpandableListAdapter {
         venNameOrdersList.setText(vendor.get("name").toString());
         textViewVenOrderId.setText(vendor.get("orderId").toString());
 
-        if(vendor.get("orderStatus").toString().equals("Order Accepted") || vendor.get("orderStatus").toString().equals("Order Cancelled")) {
+        if(vendor.get("orderStatus").toString().equals("ACCEPTED")) {
             textViewOrderList1.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.bizzorange));
             textViewOrderList1.setTextColor(ContextCompat.getColor(context, R.color.white));
-            textViewOrderListStatus1.setText(vendor.get("orderStatus").toString());
+            textViewOrderListStatus1.setText("Order Accepted");
 
-        } else if(vendor.get("orderStatus").toString().equals("Ready to Pick")) {
+        } else if(vendor.get("orderStatus").toString().equals("CANCELLED")) {
+            textViewOrderList1.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.bizzorange));
+            textViewOrderList1.setTextColor(ContextCompat.getColor(context, R.color.white));
+            textViewOrderListStatus1.setText("Order Cancelled");
+
+        } else if(vendor.get("orderStatus").toString().equals("CLOSED")) {
             textViewOrderList1.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.bizzorange));
             textViewOrderList1.setTextColor(ContextCompat.getColor(context, R.color.white));
             textViewOrderList2.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.bizzorange));
             textViewOrderList2.setTextColor(ContextCompat.getColor(context, R.color.white));
             textViewOrderListStatus1.setText("Order Accepted");
-            textViewOrderListStatus2.setText(vendor.get("orderStatus").toString());
+            textViewOrderListStatus2.setText("Ready to Pick");
         }
 
         return convertView;

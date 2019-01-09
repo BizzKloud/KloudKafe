@@ -5,8 +5,9 @@
     <dimen name= "actionbar_title">24sp</dimen>
     <dimen name= "vendor_name_cart">24sp</dimen>
     <dimen name= "vendor_name_card">24sp</dimen>
+    <dimen name= "vendor_changevendor_name_card">20sp</dimen>
     <dimen name= "fooditem_name_cart">22sp</dimen>
-    <dimen name= "fooditem_amount_cart">20sp</dimen>
+    <dimen name= "fooditem_amount_cart">22sp</dimen>
     <dimen name= "vendor_tax_amount_cart">18sp</dimen>
     <dimen name= "vendor_subtotal_amount_cart">20sp</dimen>
     <dimen name= "vendor_grandtotal_amount_cart">22sp</dimen>

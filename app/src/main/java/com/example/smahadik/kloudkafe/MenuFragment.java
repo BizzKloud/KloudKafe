@@ -87,7 +87,7 @@ public class MenuFragment extends Fragment {
 
         // Vendor List
         recyclerviewVendorList = view.findViewById(R.id.recyclerviewVendorList);
-        recyclerViewAdapterVendorList = new RecyclerViewAdapterVendorList(getContext());
+        recyclerViewAdapterVendorList = new RecyclerViewAdapterVendorList(getContext() , false);
         recyclerviewVendorList.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerviewVendorList.setAdapter(recyclerViewAdapterVendorList);
 

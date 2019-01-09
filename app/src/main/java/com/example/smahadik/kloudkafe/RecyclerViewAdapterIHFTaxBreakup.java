@@ -34,7 +34,7 @@ public class RecyclerViewAdapterIHFTaxBreakup extends RecyclerView.Adapter<Recyc
                 + Home.cartFCTaxArr.get(position+1).get("taxPer").toString()
                 + "%";
         holder.textViewTaxLabel.setText(label);
-        holder.textViewTaxAmount.setText(Home.currencyFc + Home.formatter.format(Home.cartFCTaxArr.get(position+1).get("amount")));
+        holder.textViewTaxAmount.setText(Home.currencyFc + Home.formatter.format( Double.parseDouble(Home.cartFCTaxArr.get(position+1).get("amount").toString())) );
     }
 
 

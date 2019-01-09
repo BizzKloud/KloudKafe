@@ -38,8 +38,9 @@ public class RecyclerViewAdapterVendorTaxBreakup extends RecyclerView.Adapter<Re
                 + Home.cartVendorTaxArr.get(this.position).get(position).get("taxPer").toString()
                 + "%";
         holder.textViewTaxLabel.setText(label);
-        holder.textViewTaxAmount.setText(Home.currencyFc + Home.formatter.format(Home.cartVendorTaxArr.get(this.position).get(position).get("amount")));
+        holder.textViewTaxAmount.setText(Home.currencyFc +  Home.formatter.format(Double.parseDouble(Home.cartVendorTaxArr.get(this.position).get(position).get("amount").toString())) )  ;
     }
+
 
     @Override
     public int getItemCount() {

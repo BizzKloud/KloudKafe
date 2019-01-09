@@ -21,7 +21,7 @@
         <item name="colorAccent">@color/bizzorange</item>
         <item name="android:color">@color/bizzorange</item>
         <item name="colorControlActivated">@color/bizzorange</item>
-        <item name="android:colorForeground">#ffff8800</item>
+        <!--<item name="android:colorForeground">#ffff8800</item>-->
         <!--<item name="android:colorControlHighlight">@color/bizzorange</item>-->
     </style>
 
@@ -89,6 +89,11 @@
         <!--<item name="colorControlNormal">@android:color/transparent</item>-->
         <item name="colorAccent">@color/bizzorange</item>
         <item name="colorControlActivated">@color/bizzorange</item>
+    </style>
+
+
+    <style name="count_style" >
+        <item name="android:background">@drawable/gradient_count</item>
     </style>
 
 </resources>

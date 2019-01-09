@@ -19,7 +19,8 @@
         android:id="@+id/navigation_cart"
         android:icon="@drawable/addedtocart_icon"
         android:title="@string/title_cart"
-        app:showAsAction="always|withText"/>
+        app:showAsAction="always|withText"
+        />
 
     <item
         android:id="@+id/navigation_order"

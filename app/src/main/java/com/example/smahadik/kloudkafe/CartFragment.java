@@ -53,10 +53,10 @@ public class CartFragment extends Fragment {
     Dialog payModePopUp;
 
     DocumentReference placeOrderDbRef;
-    int lenOrderId;
+//    int lenOrderId;
     String newOrderId;
     String venOrderId;
-    String [] venIdArr;
+//    String [] venIdArr;
 
 
     @Override
@@ -190,6 +190,7 @@ public class CartFragment extends Fragment {
         paynowButton.setText(paynowText);
     }
 
+
     public void placeOrder() {
 
         placeOrderDbRef = Home.dbTransaction.document(Home.todaysDate).collection(Home.orderId).document("Total");
@@ -202,12 +203,15 @@ public class CartFragment extends Fragment {
         placeOrderDbRef.set(Home.orderDetails);
 
         for (int i=0; i<Home.cartVendorArr.size(); i++) {
-            venIdArr = Home.cartVendorArr.get(i).get("venid").toString().split("_");
-            venOrderId = Home.orderId + "_" +  venIdArr[4];
+//            venIdArr = Home.cartVendorArr.get(i).get("venid").toString().split("_");
+//            venOrderId = Home.orderId + "_" +  venIdArr[venIdArr.length-1];
+            venOrderId = Home.orderId + Home.cartVendorArr.get(i).get("venid").toString().substring(Home.cartVendorArr.get(i).get("venid").toString().length()-3);
             Home.cartVendorArr.get(i).put("orderId" , venOrderId);
             placeOrderDbRef = Home.dbTransaction.document(Home.todaysDate).collection(Home.orderId).document(venOrderId);
             placeOrderDbRef.set(Home.cartVendorArr.get(i));
         }
+
+
 
         for (int i=0; i<Home.cartVendorArr.size(); i++) {
             for (int j=0; j<Home.cartArr.get(i).size(); j++) {
@@ -226,7 +230,7 @@ public class CartFragment extends Fragment {
             placeOrderDbRef = Home.dbTransaction.document(Home.todaysDate).collection(Home.orderId).document("Freebie");
             placeOrderDbRef.set(Home.freebieArr.get(0));
             placeOrderDbRef = Home.db.document(Home.fcDetails.get("fcid").toString() + "/FreebieM/" + Home.freebieArr.get(0).get("frb_id"));
-            placeOrderDbRef.update("frb_id" , Integer.parseInt(Home.freebieArr.get(0).get("count").toString())-1);
+            placeOrderDbRef.update("count" , Integer.parseInt(Home.freebieArr.get(0).get("count").toString())-1);
         }
 
         for (int i=0; i<Home.cartFCTaxArr.size(); i++) {
@@ -265,13 +269,21 @@ public class CartFragment extends Fragment {
                     Home.orderDetails.put("orderId" , Home.orderId);
                     Home.orderDetails.put("time" , Calendar.getInstance().getTime());
                     newOrderId = String.valueOf(Integer.parseInt(Home.orderId)+1);
-                    lenOrderId = newOrderId.length();
-                    for (int i=0; i< 9-lenOrderId; i++) {
-                        newOrderId = "0" + newOrderId;
-                    }
+                    newOrderId = Home.zeros[newOrderId.length()-1] + newOrderId;
+//                    lenOrderId = newOrderId.length();
+//                    for (int i=0; i< 9-lenOrderId; i++) {
+//                        newOrderId = "0" + newOrderId;
+//                    }
                     dbref.update("orderId" , newOrderId );
                     Home.progressDialog.setMessage("Placing Your Order");
                     Home.progressDialog.show();
+
+                    if(Home.checkStartOrderID) {
+                        checkOrderId();
+                    }
+                    dbref = Home.firestore.document("transactions/" + Home.fcDetails.get("fcid").toString() + "/orders/" + Home.todaysDate);
+                    dbref.update("eOrderId" , Home.orderId);
+
                     placeOrder();
                 } else {
                     Log.i("Doc not exists --  ERROR " , "No such document");
@@ -280,6 +292,33 @@ public class CartFragment extends Fragment {
             }
         });
         return Home.orderId;
+    }
+
+
+    public void checkOrderId() {
+        Home.firestore.collection("transactions").document(Home.fcDetails.get("fcid").toString() + "/orders/" + Home.todaysDate).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    DocumentReference dbref = Home.firestore.document("transactions/" + Home.fcDetails.get("fcid").toString() + "/orders/" + Home.todaysDate);
+                    if (document.exists()) {
+                        Log.i("TODAYS DATE-Doc exists" , "DocumentSnapshot data: " + document.getData());
+                    } else {
+                        Log.i("TODAYS DATE-Doc NOT exists" , "DocumentSnapshot data = CREATED ");
+                        HashMap dates = new HashMap();
+                        dates.put("sOrderId" , Home.orderId);
+                        dates.put("eOrderId" , Home.orderId);
+                        dbref.set(dates);
+                    }
+                    Home.checkStartOrderID = false;
+                } else {
+                    Log.i("ERROR - TODAYS DATE-Doc NOT exists" , "DocumentSnapshot data = CREATED ");
+                    Toast.makeText(getContext(), "ERROR getting ORDER-ID", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
     }
 
     public void notifyForUpdates() {

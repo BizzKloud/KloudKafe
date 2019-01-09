@@ -3,6 +3,7 @@ package com.example.smahadik.kloudkafe;
 import android.app.Dialog;
 import android.content.Context;
 import android.media.Image;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.CardView;
@@ -39,6 +40,7 @@ public class RecyclerViewAdapterFoodItemList extends RecyclerView.Adapter<Recycl
     View view;
     StorageReference fooditemStorageRef;
     Home home = new Home();
+
 
 
     public RecyclerViewAdapterFoodItemList (Context context, int catpos) {
@@ -90,15 +92,27 @@ public class RecyclerViewAdapterFoodItemList extends RecyclerView.Adapter<Recycl
             @Override
             public void onClick(View v) {
                 //Add or Remove  to/from Cart
+
                 if(home.checkFoodIteminCart(foodItemHashMap)) {
+                    Home.progressDialog.setMessage("Adding Food Item to your Cart");
                     holder.addtocartMenu.setImageResource(R.drawable.addtocart_blueicon);
                     home.removefromcart(foodItemHashMap);
-                    VendorItemListFragment.drawerLayout.openDrawer(Gravity.END);
                 }else {
+                    Home.progressDialog.setMessage("Removing Food Item from your Cart");
                     holder.addtocartMenu.setImageResource(R.drawable.addedtocart_orangeicon);
                     home.addtocart(foodItemHashMap);
-                    VendorItemListFragment.drawerLayout.openDrawer(Gravity.END);
                 }
+
+                Home.progressDialog.show();
+                VendorItemListFragment.drawerLayout.openDrawer(Gravity.END);
+                new CountDownTimer(1000, 1000) {
+                    @Override
+                    public void onTick(long millisUntilFinished) { }
+                        @Override
+                        public void onFinish() {
+                           Home.progressDialog.dismiss();
+                    }
+                }.start();
             }
         });
 

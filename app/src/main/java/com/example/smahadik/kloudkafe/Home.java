@@ -12,11 +12,14 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.design.internal.BottomNavigationItemView;
+import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -100,6 +103,7 @@ public class Home extends AppCompatActivity {
     public static CountDownTimer inActiveCounternew;
     Boolean getVendorIdVar;
     Boolean getCatIdVar;
+    public static Boolean checkStartOrderID = true;
     public static FragmentManager fragmentManager;
     public static FragmentTransaction ft;
     public static ProgressDialog progressDialog;
@@ -109,7 +113,6 @@ public class Home extends AppCompatActivity {
     //Home Initials
     CartFragment cartFragment = new CartFragment();
     public static Home home = new Home();
-    public static OrdersPageFragment ordersPageFragment = new OrdersPageFragment();
     public static ArrayList<HashMap> advertisementArr;
     public static ArrayList<HashMap> whatsNewArr;
     public static ArrayList<HashMap> ymalArr;
@@ -132,6 +135,7 @@ public class Home extends AppCompatActivity {
     public static String currencyFc;
     public static String orderId;
     public static Boolean orderPlaced = false;
+    public static String [] zeros = {"00000000" , "0000000" , "000000" , "00000" , "0000" , "000" , "00" , "0"};
 
 
     // Asysny Initials
@@ -204,6 +208,7 @@ public class Home extends AppCompatActivity {
 //        getSupportActionBar().hide();
 //        advFrag = new AdvertisementFragment();
 
+
         fragmentManager = getFragmentManager();
         ft = fragmentManager.beginTransaction();
 
@@ -260,8 +265,19 @@ public class Home extends AppCompatActivity {
 
 
         navigation = findViewById(R.id.navigation);
+
+        View view1 = LayoutInflater.from(this).inflate(R.layout.bottom_navigation_home_card, null);
+        View view2 = LayoutInflater.from(this).inflate(R.layout.bottom_navigation_home_card, null);
+        View view3 = LayoutInflater.from(this).inflate(R.layout.bottom_navigation_home_card, null);
+        View view4 = LayoutInflater.from(this).inflate(R.layout.bottom_navigation_home_card, null);
+        navigation.addView(view1, 0);
+        navigation.addView(view2, 1);
+        navigation.addView(view3, 2);
+        navigation.addView(view4, 3);
+
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        BottomNavigationViewHelper.removeShiftMode(navigation);
+//        BottomNavigationViewHelper.removeShiftMode(navigation);
+
 
 
 //        navigation.setSelectedItemId(R.id.navigation_home);
@@ -505,9 +521,9 @@ public class Home extends AppCompatActivity {
     public void addVendorDetailsToCart(int pos, int cartpos) {
         HashMap newVendorArrayList = vendorArr.get(pos);
 
-        newVendorArrayList.put("orderStatus", "Not Created" );
+        newVendorArrayList.put("orderStatus", "OPEN" );
         ArrayList<String> oHStatus = new ArrayList<>();
-        oHStatus.add("Placed");
+        oHStatus.add("OPEN");
         newVendorArrayList.put("oHStatus", oHStatus );
         newVendorArrayList.put("orderId", 00 );
         newVendorArrayList.put("baseAmount", 00 );
@@ -542,7 +558,7 @@ public class Home extends AppCompatActivity {
         for(int i=0; i<cartVendorTaxArr.get(position).size(); i++) {
             taxAmount = taxAmount + ( (amount *  Double.parseDouble(Home.cartVendorTaxArr.get(position).get(i).get("taxPer").toString())) /100 );
             taxAmount = Double.parseDouble(Home.decimalFormatter.format(taxAmount));
-            cartVendorTaxArr.get(position).get(i).put("amount" , (amount *  Double.parseDouble(Home.cartVendorTaxArr.get(position).get(i).get("taxPer").toString()))/100 );
+            cartVendorTaxArr.get(position).get(i).put("amount" , Home.decimalFormatter.format((amount *  Double.parseDouble(Home.cartVendorTaxArr.get(position).get(i).get("taxPer").toString()))/100 )  );
         }
         cartVendorArr.get(position).put("totalTax" , taxAmount);
         cartVendorArr.get(position).put("subTotalAmount" , Double.parseDouble(Home.decimalFormatter.format(taxAmount + amount)) );

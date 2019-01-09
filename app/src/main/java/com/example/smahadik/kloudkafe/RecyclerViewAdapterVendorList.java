@@ -31,9 +31,11 @@ public class RecyclerViewAdapterVendorList extends RecyclerView.Adapter<Recycler
     StorageReference advStorageRef;
     View view;
     LayoutInflater layoutInflater;
+    Boolean changeVendor;
 
-    public RecyclerViewAdapterVendorList(Context mContext) {
+    public RecyclerViewAdapterVendorList(Context mContext, Boolean changeVendor) {
         this.mContext = mContext;
+        this.changeVendor = changeVendor;
     }
 
     @NonNull
@@ -41,7 +43,11 @@ public class RecyclerViewAdapterVendorList extends RecyclerView.Adapter<Recycler
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         layoutInflater = LayoutInflater.from(mContext);
-        view = layoutInflater.inflate(R.layout.vendor_cardview, parent, false);
+        if(changeVendor) {
+            view = layoutInflater.inflate(R.layout.vendor_changevendor_cardview, parent, false);
+        } else {
+            view = layoutInflater.inflate(R.layout.vendor_cardview, parent, false);
+        }
         return new MyViewHolder(view);
     }
 
@@ -72,6 +78,11 @@ public class RecyclerViewAdapterVendorList extends RecyclerView.Adapter<Recycler
         holder.vendorCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if(VendorItemListFragment.changeVendorPopUp != null) {
+                    VendorItemListFragment.changeVendorPopUp.dismiss();
+                }
+
                 Home.vendorPosition = position;
                 Home.lastVendorPosition = position;
                 Home.ft = Home.fragmentManager.beginTransaction();

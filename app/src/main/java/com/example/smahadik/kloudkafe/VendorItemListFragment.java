@@ -1,9 +1,12 @@
 package com.example.smahadik.kloudkafe;
 
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -11,6 +14,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -39,6 +43,9 @@ public class VendorItemListFragment extends Fragment{
     Home home = new Home();
     int venpos;
     int lastvenpos;
+    public static Dialog changeVendorPopUp;
+    RecyclerView recyclerviewVendorListChangeVendor;
+    RecyclerViewAdapterVendorList recyclerViewAdapterVendorList;
 
 
     @Override
@@ -61,6 +68,9 @@ public class VendorItemListFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.vendor_item_list_fragment, container, false);
+
+        changeVendorPopUp = new Dialog(getContext());
+        changeVendorPopUp.setCanceledOnTouchOutside(true);
 
         toolbar = view.findViewById(R.id.toolbar);
         backButtontoMenu = toolbar.findViewById(R.id.backButtontoMenu);
@@ -90,11 +100,7 @@ public class VendorItemListFragment extends Fragment{
         changeVendorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                drawerLayout.openDrawer(Gravity.END);
-//                FragmentManager fragmentManager = getFragmentManager();
-//                FragmentTransaction ft = fragmentManager.beginTransaction();
-//                ft.replace(R.id.cartDrawerFrameLayout, new CartFragment());
-//                ft.commit();
+                showPopupChangeVendor();
             }
         });
 
@@ -107,19 +113,7 @@ public class VendorItemListFragment extends Fragment{
                 lastvenpos = Home.lastVendorPosition;
                 Log.i("Called Opened", String.valueOf(lastvenpos) );
                 Home.catPosition = foodItemListViewPager.getCurrentItem();
-//                Home.fragmentManager = getFragmentManager();
-//                Home.ft = Home.fragmentManager.beginTransaction();
-//                if(Home.flagCartFirst) {
-//                    Log.i("Flag CART FIRST " ,  "Flag CART FIRST = TRUE");
-//                    Home.ft.replace(R.id.cartDrawerFrameLayout, new CartFragment(), CartFragment.class.getName()+"1");
-//                    Home.ft.addToBackStack(null);
-//                    Log.i("BACKSTACK ENTRY LIST", String.valueOf(getFragmentManager().getBackStackEntryCount()));
-//                    Home.flagCartFirst = false;
-//                } else {
-//                    Log.i("Flag CART SECOND " ,  "Flag CART SECOND = TRUE");
-//                    Home.ft.replace(R.id.cartDrawerFrameLayout, Home.fragmentManager.findFragmentByTag(CartFragment.class.getName()+"1"));
-//                }
-//                Home.ft.commit();
+
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction ft = fragmentManager.beginTransaction();
                 ft.replace(R.id.cartDrawerFrameLayout, new CartFragment());
@@ -147,8 +141,26 @@ public class VendorItemListFragment extends Fragment{
 
         foodItemListViewPager = (ViewPager) view.findViewById(R.id.foodItemListViewPager);
 //        foodItemListViewPager.addOnPageChangeListener(viewListener);
+        if(categorySliderAdapter != null) {
+            categorySliderAdapter.notifyDataSetChanged();
+        }
         setupViewPager();
         return view;
+
+    } // ONCReate DOne
+
+
+    public void showPopupChangeVendor() {
+
+        changeVendorPopUp.setContentView(R.layout.change_vendor_popup);
+
+        // Vendor List
+        recyclerviewVendorListChangeVendor = changeVendorPopUp.findViewById(R.id.recyclerviewVendorListChangeVendor);
+        recyclerViewAdapterVendorList = new RecyclerViewAdapterVendorList(getContext(), true);
+        recyclerviewVendorListChangeVendor.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        recyclerviewVendorListChangeVendor.setAdapter(recyclerViewAdapterVendorList);
+
+        changeVendorPopUp.show();
     }
 
 
@@ -156,6 +168,7 @@ public class VendorItemListFragment extends Fragment{
     private void setupViewPager() {
         categorySliderAdapter = new CategorySliderAdapter(getContext());
         foodItemListViewPager.setAdapter(categorySliderAdapter);
+        categorySliderAdapter.notifyDataSetChanged();
         categoryTabs = (TabLayout) view.findViewById(R.id.categoryTabs);
         categoryTabs.setupWithViewPager(foodItemListViewPager);
     }

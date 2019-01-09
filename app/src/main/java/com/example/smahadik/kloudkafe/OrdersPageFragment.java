@@ -62,6 +62,7 @@ public class OrdersPageFragment extends Fragment {
             setOrderListAdapter();
         }
 
+
         return view;
     }
 
@@ -113,13 +114,6 @@ public class OrdersPageFragment extends Fragment {
         Home.orderIdArr.add(orderId);
 
         //getting Order-vendor details
-        Home.dbTransaction.document(Home.todaysDate).collection(orderId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
-            }
-        });
-
         Home.dbTransaction.document(Home.todaysDate).collection(orderId).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
@@ -133,7 +127,7 @@ public class OrdersPageFragment extends Fragment {
 
                 int id = findOrder(Odr1);
                 if(id != -1) {
-                    // to to particular field
+                    // ADD to to particular field
                     Home.orderVendorArr.set(id, Odr1);
                     Log.i("UPDATED ORDER ID DETAILS" , Home.orderIdArr.toString());
                     Log.i("UPDATED VENDOR ORDER DETAILS" , Home.orderVendorArr.toString());

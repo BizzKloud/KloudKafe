@@ -12,7 +12,7 @@
         android:layout_height="160dp"
         style="@style/circular_corner"
         android:orientation="horizontal"
-        android:background="@color/bizzorange"
+        android:backgroundTint="@color/bizzorange"
         android:weightSum="10">
 
         <ImageView
