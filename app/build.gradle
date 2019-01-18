@@ -39,6 +39,10 @@ dependencies {
     //ADD LIBRARY
     api 'com.github.devlight:infinitecycleviewpager:1.0.2'
 //    implementation 'com.github.antonyt:InfiniteViewPager:v1.0.0'
+
+    // BottomNavigation Badge Counter Library
+//    compile 'com.aurelhubert:ahbottomnavigation:2.3.4'
+
 }
 
 

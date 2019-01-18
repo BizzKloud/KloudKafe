@@ -69,9 +69,6 @@ public class VendorItemListFragment extends Fragment{
 
         view = inflater.inflate(R.layout.vendor_item_list_fragment, container, false);
 
-        changeVendorPopUp = new Dialog(getContext());
-        changeVendorPopUp.setCanceledOnTouchOutside(true);
-
         toolbar = view.findViewById(R.id.toolbar);
         backButtontoMenu = toolbar.findViewById(R.id.backButtontoMenu);
         changeVendorButton = view.findViewById(R.id.changeVendorButton);
@@ -151,7 +148,8 @@ public class VendorItemListFragment extends Fragment{
 
 
     public void showPopupChangeVendor() {
-
+        changeVendorPopUp = new Dialog(getContext());
+        changeVendorPopUp.setCanceledOnTouchOutside(false);
         changeVendorPopUp.setContentView(R.layout.change_vendor_popup);
 
         // Vendor List
@@ -160,6 +158,14 @@ public class VendorItemListFragment extends Fragment{
         recyclerviewVendorListChangeVendor.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerviewVendorListChangeVendor.setAdapter(recyclerViewAdapterVendorList);
 
+        Button closeChangeVendorButton = changeVendorPopUp.findViewById(R.id.closeChangeVendorButton);
+        closeChangeVendorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { changeVendorPopUp.dismiss();
+            }
+        });
+
+        changeVendorPopUp.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         changeVendorPopUp.show();
     }
 

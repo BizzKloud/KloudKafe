@@ -99,6 +99,9 @@ public class RecyclerViewAdapterFoodItemListCart extends RecyclerView.Adapter<Re
                 }else {
                     Toast.makeText(context, "Item Quantity MAX limit Reached", Toast.LENGTH_SHORT).show();
                 }
+
+                Home.cartCounter++;
+                Home.cartCounterTextView.setText(String.valueOf(Home.cartCounter));
             }
         });
 
@@ -115,6 +118,9 @@ public class RecyclerViewAdapterFoodItemListCart extends RecyclerView.Adapter<Re
                     holder.textViewFoodItemQuantity.setText(String.valueOf(quantity));
                     updates(holder, position);
                     cartFragment.notifyForUpdates();
+
+                    Home.cartCounter--;
+                    Home.cartCounterTextView.setText(String.valueOf(Home.cartCounter));
 
                 }else if(quantity == 0){
                     Home.progressDialog.setMessage("Please Wait..");

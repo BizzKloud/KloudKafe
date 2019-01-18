@@ -1,16 +1,16 @@
 package com.example.smahadik.kloudkafe;
 
-import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.net.Uri;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.internal.BottomNavigationMenuView;
@@ -18,21 +18,16 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewSwitcher;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -47,27 +42,19 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.annotation.Nullable;
-
-import io.grpc.Context;
 
 public class Home extends AppCompatActivity {
 
@@ -95,6 +82,10 @@ public class Home extends AppCompatActivity {
 
 
     public static BottomNavigationView navigation;
+    BottomNavigationMenuView menuView;
+    public static TextView cartCounterTextView;
+    public static int cartCounter=0;
+
     public static Boolean flagAdvFirst = true;
     public static Boolean flagMenuFirst = true;
     public static Boolean flagCartFirst = true;
@@ -112,6 +103,7 @@ public class Home extends AppCompatActivity {
 
     //Home Initials
     CartFragment cartFragment = new CartFragment();
+//    Dialog notificationPopUp;
     public static Home home = new Home();
     public static ArrayList<HashMap> advertisementArr;
     public static ArrayList<HashMap> whatsNewArr;
@@ -129,12 +121,15 @@ public class Home extends AppCompatActivity {
     public static ArrayList<String> orderIdArr = new ArrayList<>();
     public static ArrayList<ArrayList <HashMap>> orderVendorArr = new ArrayList<>();
     public static ArrayList<ArrayList<ArrayList <HashMap>>> orderFoodItemArr = new ArrayList<>();
+    public static ArrayList <HashMap> orderNotificationArr = new ArrayList<>();
     public static int vendorPosition;
     public static int catPosition;
-    public static int lastVendorPosition;
+    public static int lastVendorPosition = -1;
     public static String currencyFc;
     public static String orderId;
     public static Boolean orderPlaced = false;
+    public static Boolean checkPreviousOrders = true;
+    public static Boolean notificationActive = false;
     public static String [] zeros = {"00000000" , "0000000" , "000000" , "00000" , "0000" , "000" , "00" , "0"};
 
 
@@ -204,10 +199,7 @@ public class Home extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        // HIDE ACTION BAR;
-//        getSupportActionBar().hide();
-//        advFrag = new AdvertisementFragment();
-
+        clearEveryThing();
 
         fragmentManager = getFragmentManager();
         ft = fragmentManager.beginTransaction();
@@ -239,6 +231,7 @@ public class Home extends AppCompatActivity {
         basicDetails.put("iHFtax" , 0);
         basicDetails.put("iHFTotalAmount" , 0);
         basicDetails.put("grandTotal" , 0);
+//        notificationPopUp = new Dialog(this);
         menuInit();
         cartInit();
         dbTransaction = firestore.collection("transactions/" + fcDetails.get("fcid") + "/orders");
@@ -260,23 +253,22 @@ public class Home extends AppCompatActivity {
                         "", Toast.LENGTH_SHORT).show();
                 getFoodItem();
                 getVendorTax();
+                navigation.setSelectedItemId(R.id.navigation_home);
             }
         }.start();
 
 
+
+
+        // BOttom Navigation Initialization
         navigation = findViewById(R.id.navigation);
-
-        View view1 = LayoutInflater.from(this).inflate(R.layout.bottom_navigation_home_card, null);
-        View view2 = LayoutInflater.from(this).inflate(R.layout.bottom_navigation_home_card, null);
-        View view3 = LayoutInflater.from(this).inflate(R.layout.bottom_navigation_home_card, null);
-        View view4 = LayoutInflater.from(this).inflate(R.layout.bottom_navigation_home_card, null);
-        navigation.addView(view1, 0);
-        navigation.addView(view2, 1);
-        navigation.addView(view3, 2);
-        navigation.addView(view4, 3);
-
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-//        BottomNavigationViewHelper.removeShiftMode(navigation);
+        BottomNavigationViewHelper.removeShiftMode(navigation);
+        menuView = (BottomNavigationMenuView) navigation.getChildAt(0);
+        setBottomNavigationIconSize();
+        addCartBadgeView();
+        addOrdersBadgeView();
+
 
 
 
@@ -297,7 +289,8 @@ public class Home extends AppCompatActivity {
 
 
 
-    }
+    } // ONCREARTE DONE
+
 
 
 
@@ -358,6 +351,7 @@ public class Home extends AppCompatActivity {
         }
     }
 
+
     public void pushOrdersFrag() {
         if(navigation.getSelectedItemId() != R.id.navigation_order) {
             stopImageSwitcher(true, true);
@@ -375,7 +369,6 @@ public class Home extends AppCompatActivity {
     }
 
 
-
     public void stopImageSwitcher(boolean advCancelled, boolean menuCancelled) {
         AdvertisementFragment.cancelled = advCancelled;
         MenuFragment.cancelled = menuCancelled;
@@ -385,6 +378,32 @@ public class Home extends AppCompatActivity {
 //        }
     }
 
+
+    public void addCartBadgeView() {
+        BottomNavigationItemView itemView = (BottomNavigationItemView) menuView.getChildAt(2);
+        View notificationBadge = LayoutInflater.from(this).inflate(R.layout.bottomview_notification_badge_cart, menuView, false);
+        cartCounterTextView = notificationBadge.findViewById(R.id.cartCountBadgeTextView);
+        cartCounterTextView.setText(String.valueOf(cartCounter));
+        cartCounterTextView.setVisibility(View.INVISIBLE);
+        itemView.addView(notificationBadge);
+    }
+
+    public void addOrdersBadgeView() {
+        BottomNavigationItemView itemView = (BottomNavigationItemView) menuView.getChildAt(3);
+        View notificationBadge = LayoutInflater.from(this).inflate(R.layout.bottomview_notification_badge_orders, menuView, false);
+        itemView.addView(notificationBadge);
+    }
+
+    public void setBottomNavigationIconSize() {
+        for (int i = 0; i < menuView.getChildCount(); i++) {
+            View iconView = menuView.getChildAt(i).findViewById(android.support.design.R.id.icon);
+            ViewGroup.LayoutParams layoutParams = iconView.getLayoutParams();
+            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+            layoutParams.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 28, displayMetrics);
+            layoutParams.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 28, displayMetrics);
+            iconView.setLayoutParams(layoutParams);
+        }
+    }
 
 
     // Menu ========================================================================================
@@ -429,7 +448,12 @@ public class Home extends AppCompatActivity {
         foodItem.put("totalAmount", foodItem.get("amount").toString());
         Boolean venidFoundFlag = false;
 
-        Log.i("FoodItem At addtocart" , foodItem.toString());
+        cartCounter++;
+        if(cartCounter == 1) {
+            cartCounterTextView.setVisibility(View.VISIBLE);
+        }
+        cartCounterTextView.setText(String.valueOf(cartCounter));
+//        Log.i("FoodItem At addtocart" , foodItem.toString());
 
         if(cartArr.size() > 0 ){
             for (int i=0; i<cartArr.size(); i++) {
@@ -475,6 +499,14 @@ public class Home extends AppCompatActivity {
                 for(int j=0; j<cartArr.get(i).size(); j++){
                     if(cartArr.get(i).get(j).get("fdid").toString().equals(foodItem.get("fdid").toString())
                             && cartArr.get(i).get(j).get("catid").toString().equals(foodItem.get("catid").toString()) ) {
+
+                        cartCounter = cartCounter - Integer.parseInt(cartArr.get(i).get(j).get("quantity").toString());
+                        if(cartCounter > 0) {
+                            cartCounterTextView.setText(String.valueOf(cartCounter));
+                        } else {
+                            cartCounterTextView.setVisibility(View.INVISIBLE);
+                        }
+
                         // FoodItem Found
                         if(cartArr.get(i).size() == 1){
                             cartArr.remove(i);
@@ -492,6 +524,7 @@ public class Home extends AppCompatActivity {
                             calculateTaxAndVendorAmount(i);
                             calculateIHFAndGrandTotal();
                         }
+
                         break;
                     }
                 }
@@ -600,7 +633,7 @@ public class Home extends AppCompatActivity {
             orderDetails.put("iHFTotalAmount" , Double.parseDouble(decimalFormatter.format(totalTaxAmount + baseAmount)) );
             orderDetails.put("grandTotal" , Double.parseDouble(decimalFormatter.format(Double.parseDouble(orderDetails.get("baseAmount").toString()) + totalTaxAmount + baseAmount)) );
             orderDetails.put("modeOfPay" , "CASH" );
-            orderDetails.put("finalOrderStatus" , "CREATED" );
+            orderDetails.put("finalOrderStatus" , "OPEN" );
 //        }
 
         if(CartFragment.textViewIHFPer != null) {
@@ -612,7 +645,34 @@ public class Home extends AppCompatActivity {
     }
 
     public void clearcartButton(View view) {
-        clearcart();
+
+        if(cartArr.size() > 0) {
+            final Dialog clearCartConfirmationPopup = new Dialog(this);
+            clearCartConfirmationPopup.setContentView(R.layout.clearcart_confirmation_popup_card);
+
+            Button clearCartCancelButton = clearCartConfirmationPopup.findViewById(R.id.clearCartCancelButton);
+            Button clearCartYesButton = clearCartConfirmationPopup.findViewById(R.id.clearCartYesButton);
+
+            clearCartCancelButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) { clearCartConfirmationPopup.dismiss();
+                }
+            });
+            clearCartYesButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    clearcart();
+                    clearCartConfirmationPopup.dismiss();
+                }
+            });
+
+            clearCartConfirmationPopup.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            clearCartConfirmationPopup.show();
+        } else {
+            Toast.makeText(Home.this, "CART IS EMPTY", Toast.LENGTH_LONG).show();
+        }
+
+
     }
     public void clearcart(){
         cartArr.clear();
@@ -622,6 +682,8 @@ public class Home extends AppCompatActivity {
         if(CartFragment.recyclerViewAdapterCartVendorList != null) {
             cartFragment.notifyForUpdates();
         }
+        cartCounter = 0;
+        cartCounterTextView.setVisibility(View.INVISIBLE);
     }
 
     public HashMap findFoodItem(HashMap fooditem) {
@@ -1177,6 +1239,14 @@ public class Home extends AppCompatActivity {
         }.start();
     }
 
+
+
+    public void clearEveryThing () {
+        orderIdArr.clear();
+        orderVendorArr.clear();
+        orderFoodItemArr.clear();
+        orderNotificationArr.clear();
+    }
 
 
 

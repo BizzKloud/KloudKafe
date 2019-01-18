@@ -36,6 +36,10 @@
         <item name="android:background">@drawable/circular_corners</item>
     </style>
 
+    <style name="circular_corners_only_top" >
+        <item name="android:background">@drawable/circular_corners_only_top</item>
+    </style>
+
     <style name="circle_textview_orderslist" >
         <item name="android:background">@drawable/circle_textview_orderslist</item>
     </style>
@@ -91,9 +95,9 @@
         <item name="colorControlActivated">@color/bizzorange</item>
     </style>
 
-
     <style name="count_style" >
-        <item name="android:background">@drawable/gradient_count</item>
+        <item name="android:background">@drawable/notification_badge_cart</item>
     </style>
+
 
 </resources>

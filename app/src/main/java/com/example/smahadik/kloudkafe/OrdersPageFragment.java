@@ -1,6 +1,10 @@
 package com.example.smahadik.kloudkafe;
 
+import android.app.Dialog;
 import android.app.Fragment;
+import android.app.ProgressDialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
@@ -10,13 +14,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,27 +51,55 @@ public class OrdersPageFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.orderspage_fragment, container, false);
-
         Log.i("ORDER PLACED BOOLEAN" , Home.orderPlaced.toString());
-        if(Home.orderPlaced) {
-            Log.i("was inside IF" , "TRUE");
-            getOrderDetails(Home.orderId);
-            new CountDownTimer(4000, 1000) {
+
+        if(Home.checkPreviousOrders) {
+            Home.progressDialog.setMessage("Checking for previously placed OPEN orders");
+            Home.progressDialog.show();
+            Log.i("was inside IF - 1" , "TRUE");
+            checkPreviouslyPlacedOrders();
+            new CountDownTimer(8000, 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
+                    if(Math.round(millisUntilFinished/1000) == 2) {
+                        Log.i("MILLLI SECONDS " , String.valueOf(millisUntilFinished) + "...." + Math.round(millisUntilFinished/1000));
+                        sortOrders();
+                    }
                 }
                 @Override
                 public void onFinish() {
+                    Log.i("ON FINISH CALLED" , "TRUE");
                     Home.progressDialog.dismiss();
+                    setOrderListAdapter();
+                    Home.checkPreviousOrders = false;
+                    if(Home.orderPlaced) { Home.orderPlaced = false; }
+                }
+            }.start();
+
+        } else if(Home.orderPlaced)  {
+            Home.progressDialog.setMessage("Getting Your Order Details");
+            Home.progressDialog.show();
+            Log.i("was inside IF - 2" , "TRUE");
+            getOrderDetails(Home.orderId);
+            new CountDownTimer(4000, 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) { }
+                @Override
+                public void onFinish() {
+                    Log.i("ON FINISH CALLED" , "TRUE");
+                    Toast.makeText(getContext(), "Order Placed Successfully", Toast.LENGTH_LONG).show();
+//                    Home.progressDialog.dismiss();
                     setOrderListAdapter();
                     Home.orderPlaced = false;
                 }
             }.start();
+
         } else {
             Log.i("was inside IF" , "FALSE");
             setOrderListAdapter();
@@ -65,8 +108,6 @@ public class OrdersPageFragment extends Fragment {
 
         return view;
     }
-
-
 
 
     public void setOrderListAdapter() {
@@ -94,7 +135,7 @@ public class OrdersPageFragment extends Fragment {
         }
 
         expandanbleordersOrdersList = view.findViewById(R.id.expandanbleordersOrdersList);
-        expandanbleordersOrdersList.setIndicatorBounds(Home.width - GetPixelFromDips(45), Home.width - GetPixelFromDips(5));
+        expandanbleordersOrdersList.setIndicatorBounds(Home.width - GetPixelFromDips(30), Home.width - GetPixelFromDips(5));
         expandableListAdapterOrdersList = new ExpandableListAdapterOrdersList(getContext(), venAr , fddAr );
         expandanbleordersOrdersList.setAdapter(expandableListAdapterOrdersList);
         expandableListAdapterOrdersList.notifyDataSetChanged();
@@ -127,12 +168,27 @@ public class OrdersPageFragment extends Fragment {
 
                 int id = findOrder(Odr1);
                 if(id != -1) {
+
+                    HashMap notificationOrder = getUpdatedOrderDetails(Home.orderVendorArr.get(id) , Odr1);
+                    if(notificationOrder != null) {
+                        Log.i("NOTIFICATION ADDED to array" , "TRUE");
+                        Home.orderNotificationArr.add(notificationOrder);
+                    }
+                    else {Log.i("Notification Vendor Not Found" , "SOME ERROR"); }
+
                     // ADD to to particular field
                     Home.orderVendorArr.set(id, Odr1);
                     Log.i("UPDATED ORDER ID DETAILS" , Home.orderIdArr.toString());
                     Log.i("UPDATED VENDOR ORDER DETAILS" , Home.orderVendorArr.toString());
                     // NOTIFICATION ==> call
                     setOrderListAdapter();
+                    if(!Home.notificationActive) {
+                        Home.notificationActive = true;
+                        showNotification();
+                        Log.i("NOTIFICATION Array" , Home.orderNotificationArr.toString());
+                    }else {
+                        Log.i("NOTIFICATION Already active" , "TRUE");
+                    }
 
 
                 } else {
@@ -141,7 +197,7 @@ public class OrdersPageFragment extends Fragment {
                     Log.i("VENDOR ORDER DETAILS" , Home.orderVendorArr.toString());
 //                    Log.i(" FOODITEM DETAILS" , Home.orderFoodItemArr.toString());
                     getOrderFoodItemDetails(orderId);
-                }
+            }
 
             }
         });
@@ -208,6 +264,169 @@ public class OrdersPageFragment extends Fragment {
 //        Log.i("Food Item in menu " , "NOT FOUND");
         return -1;
     }
+
+
+    public HashMap getUpdatedOrderDetails(ArrayList<HashMap> oldOrder , ArrayList<HashMap> updatedOrder) {
+
+        for(int i=0; i<oldOrder.size(); i++) {
+            for (int j=0; j<updatedOrder.size(); j++) {
+                if(oldOrder.get(i).get("orderId").toString().equals(updatedOrder.get(j).get("orderId").toString())) {
+                    if(oldOrder.get(i).get("orderStatus").toString().equals(updatedOrder.get(j).get("orderStatus").toString())) {
+                        continue;
+                    } else {
+                        return updatedOrder.get(j);
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+
+    public void showNotification() {
+        final Dialog notificationPopUp = new Dialog(getContext());
+        notificationPopUp.setCanceledOnTouchOutside(false);
+        notificationPopUp.setContentView(R.layout.order_notification);
+
+        final ProgressBar progressBarVenImageNotification = notificationPopUp.findViewById(R.id.progressBarVenImageNotification);
+        ImageView imageViewVenImageNotification = notificationPopUp.findViewById(R.id.imageViewVenImageNotification);
+        TextView textViewVenNameNotification = notificationPopUp.findViewById(R.id.textViewVenNameNotification);
+        TextView textViewVenOrderIdNotification = notificationPopUp.findViewById(R.id.textViewVenOrderIdNotification);
+        TextView textViewOrderStatusNotification = notificationPopUp.findViewById(R.id.textViewOrderStatusNotification);
+
+        String pic = Home.orderNotificationArr.get(0).get("pic").toString();
+        StorageReference storageRefVenImageNotification = Home.storageRef.child(pic);
+        Glide.with(imageViewVenImageNotification.getContext()).using(new FirebaseImageLoader()).load(storageRefVenImageNotification)
+                .listener(new RequestListener<StorageReference, GlideDrawable>() {
+                    @Override
+                    public boolean onException(Exception e, StorageReference model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(GlideDrawable resource, StorageReference model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        progressBarVenImageNotification.setVisibility(View.GONE);
+                        return false;
+                    }
+                }).into(imageViewVenImageNotification);
+        textViewVenNameNotification.setText(Home.orderNotificationArr.get(0).get("name").toString());
+        textViewVenOrderIdNotification.setText(Home.orderNotificationArr.get(0).get("orderId").toString());
+        textViewOrderStatusNotification.setText(Home.orderNotificationArr.get(0).get("orderStatus").toString());
+
+        notificationPopUp.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        notificationPopUp.show();
+
+        // New CountDownTimer
+        new CountDownTimer(10000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                Log.i("MILLLI SECONDS in notif" , String.valueOf(millisUntilFinished) + "...." + Math.round(millisUntilFinished/1000));
+                if(Math.round(millisUntilFinished/1000) == 2) {
+                    Log.i("MILLLI SECONDS is INSIDE NOW" , String.valueOf(millisUntilFinished) + "...." + Math.round(millisUntilFinished/1000));
+                    Home.orderNotificationArr.remove(0);
+                    notificationPopUp.dismiss();
+                }
+            }
+            @Override
+            public void onFinish() {
+                if (Home.orderNotificationArr.size() > 0) {
+                    showNotification();
+                } else {
+                    Home.notificationActive = false;
+                }
+            }
+        }.start();
+    }
+
+
+    // CHECK FOR PREVIOUSLY PLACED AND "OPEN" ORDERS =============================================================================
+    public void checkPreviouslyPlacedOrders() {
+        Home.firestore.collection("transactions").document(Home.fcDetails.get("fcid").toString() + "/orders/" + Home.todaysDate).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.i("Checking for previously PLaced orders ::" , "Document EXISTS");
+//                        Log.i("Todays Date ::" , Home.todaysDate);
+//                        Toast.makeText(getContext(), "Today's Date Exists", Toast.LENGTH_SHORT).show();
+//                        Log.i("TODAYS DATE-Doc exists" , "DocumentSnapshot data: " + document.getData());
+                        HashMap orderIDRange = (HashMap) document.getData();
+                        getPlacedOrderDetails(orderIDRange);
+                    } else {
+                        Log.i("Checking for previously PLaced orders ::" , "Document does not exists");
+                        Toast.makeText(getContext(), "Today's Date Does Not Exists", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Log.i("ERROR - Checking for previously PLaced orders" , "ERROR");
+                    Toast.makeText(getContext(), "ERROR - Checking for previously PLaced orders", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+
+    public void getPlacedOrderDetails(HashMap orderIDRange) {
+
+        int size = Integer.parseInt(orderIDRange.get("eOrderId").toString()) - Integer.parseInt(orderIDRange.get("sOrderId").toString());
+        for(int i=0; i<=size ; i++) {
+
+            String odid = orderIDRange.get("sOrderId").toString();
+            String newOrderId;
+            newOrderId = String.valueOf(Integer.parseInt(odid) + i);
+            newOrderId = Home.zeros[newOrderId.length() - 1] + newOrderId;
+
+            Log.i("Checking for OPEN ORDERS ID :" , newOrderId);
+
+            Home.dbTransaction.document(Home.todaysDate + "/" + newOrderId + "/Total").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                    if(task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if(document.exists() ) {
+                            HashMap order = (HashMap) document.getData();
+                            if(order.get("tabid").toString().equals(Home.basicDetails.get("tabid").toString()) && order.get("finalOrderStatus").toString().equals("OPEN") ) {
+                                Log.i("Found Order ID for OPEN ORDERS :" , order.get("orderId").toString());
+                                getOrderDetails(order.get("orderId").toString());
+                            }
+                        }
+                    }
+                }
+            });
+
+        }
+    }
+
+
+    public void sortOrders() {
+        for (int i = 0; i < Home.orderIdArr.size(); i++) {
+
+            for (int j = Home.orderIdArr.size() - 1; j > i; j--) {
+                if (Integer.parseInt(Home.orderIdArr.get(i)) > Integer.parseInt(Home.orderIdArr.get(j)) ) {
+
+                    String tmpOrderIdArr = Home.orderIdArr.get(i);
+                    ArrayList<HashMap> tmpOrderVendorArr = Home.orderVendorArr.get(i);
+                    ArrayList< ArrayList<HashMap> >tmpOrderFoodItemArr = Home.orderFoodItemArr.get(i);
+
+                    Home.orderIdArr.set(i, Home.orderIdArr.get(j));
+                    Home.orderIdArr.set(j,tmpOrderIdArr);
+                    Home.orderVendorArr.set(i, Home.orderVendorArr.get(j));
+                    Home.orderVendorArr.set(j,tmpOrderVendorArr);
+                    Home.orderFoodItemArr.set(i, Home.orderFoodItemArr.get(j));
+                    Home.orderFoodItemArr.set(j,tmpOrderFoodItemArr);
+                }
+
+            }
+        }
+
+//        Log.i("SORTED ORDER ID ARRAY" , Home.orderIdArr.toString());
+    }
+
+
+
+
 
 
 

@@ -80,14 +80,14 @@ public class RecyclerViewAdapterYmalList extends RecyclerView.Adapter<RecyclerVi
                 public void onClick(View v) {
                     //Add or Remove  to/from Cart
                     if(home.checkFoodIteminCart(foodItem)) {
-                        Log.i("Removing ymal" , foodItem.toString());
+//                        Log.i("Removing ymal" , foodItem.toString());
                         holder.radioButtonYmal.setChecked(false);
                         home.removefromcart(foodItem);
                         cartFragment.notifyForUpdates();
                     }else {
                         HashMap foodItemFound =  home.findFoodItem(foodItem);
                         if(foodItemFound != null) {
-                            Log.i("Adding ymal" , foodItem.toString());
+//                            Log.i("Adding ymal" , foodItem.toString());
                             holder.radioButtonYmal.setChecked(true);
                             home.addtocart(foodItem);
                             cartFragment.notifyForUpdates();

@@ -97,11 +97,12 @@ public class ExpandableListAdapterOrdersList extends BaseExpandableListAdapter {
         TextView textViewOrderList2 = convertView.findViewById(R.id.textViewOrderList2);
         TextView textViewOrderListStatus1 = convertView.findViewById(R.id.textViewOrderListStatus1);
         TextView textViewOrderListStatus2 = convertView.findViewById(R.id.textViewOrderListStatus2);
+        TextView subTotalAmountOrdersList = convertView.findViewById(R.id.subTotalAmountOrdersList);
 
         String pic = vendor.get("pic").toString();
         storageRefVenImage = Home.storageRef.child(pic);
         Glide.with(venImageOrdersList.getContext()).using(new FirebaseImageLoader()).load(storageRefVenImage)
-                .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
+//                .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
                 .listener(new RequestListener<StorageReference, GlideDrawable>() {
                     @Override
                     public boolean onException(Exception e, StorageReference model, Target<GlideDrawable> target, boolean isFirstResource) {
@@ -113,28 +114,34 @@ public class ExpandableListAdapterOrdersList extends BaseExpandableListAdapter {
                         progressBarVenImage.setVisibility(View.GONE);
                         return false;
                     }
-                })
-                .into(venImageOrdersList);
+                }).into(venImageOrdersList);
         venNameOrdersList.setText(vendor.get("name").toString());
         textViewVenOrderId.setText(vendor.get("orderId").toString());
+        subTotalAmountOrdersList.setText(Home.currencyFc + vendor.get("subTotalAmount").toString());
 
-        if(vendor.get("orderStatus").toString().equals("ACCEPTED")) {
-            textViewOrderList1.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.bizzorange));
-            textViewOrderList1.setTextColor(ContextCompat.getColor(context, R.color.white));
-            textViewOrderListStatus1.setText("Order Accepted");
+        switch (vendor.get("orderStatus").toString()) {
 
-        } else if(vendor.get("orderStatus").toString().equals("CANCELLED")) {
-            textViewOrderList1.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.bizzorange));
-            textViewOrderList1.setTextColor(ContextCompat.getColor(context, R.color.white));
-            textViewOrderListStatus1.setText("Order Cancelled");
+            case "ACCEPTED":
+                textViewOrderList1.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.bizzorange));
+                textViewOrderList1.setTextColor(ContextCompat.getColor(context, R.color.white));
+                textViewOrderListStatus1.setText("Order Accepted");
+                break;
 
-        } else if(vendor.get("orderStatus").toString().equals("CLOSED")) {
-            textViewOrderList1.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.bizzorange));
-            textViewOrderList1.setTextColor(ContextCompat.getColor(context, R.color.white));
-            textViewOrderList2.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.bizzorange));
-            textViewOrderList2.setTextColor(ContextCompat.getColor(context, R.color.white));
-            textViewOrderListStatus1.setText("Order Accepted");
-            textViewOrderListStatus2.setText("Ready to Pick");
+            case "CANCELLED":
+                textViewOrderList1.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.bizzorange));
+                textViewOrderList1.setTextColor(ContextCompat.getColor(context, R.color.white));
+                textViewOrderListStatus1.setText("Order Cancelled");
+                break;
+
+
+            case "CLOSED":
+                textViewOrderList1.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.bizzorange));
+                textViewOrderList1.setTextColor(ContextCompat.getColor(context, R.color.white));
+                textViewOrderList2.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.bizzorange));
+                textViewOrderList2.setTextColor(ContextCompat.getColor(context, R.color.white));
+                textViewOrderListStatus1.setText("Order Accepted");
+                textViewOrderListStatus2.setText("Ready to Pick");
+                break;
         }
 
         return convertView;
@@ -166,7 +173,7 @@ public class ExpandableListAdapterOrdersList extends BaseExpandableListAdapter {
         String pic = foodItem.get("pic").toString();
         storageRefFoodItemImage = Home.storageRef.child(pic);
         Glide.with(foodItemImageOrdersList.getContext()).using(new FirebaseImageLoader()).load(storageRefFoodItemImage)
-                .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
+//                .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
                 .listener(new RequestListener<StorageReference, GlideDrawable>() {
                     @Override
                     public boolean onException(Exception e, StorageReference model, Target<GlideDrawable> target, boolean isFirstResource) {

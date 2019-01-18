@@ -37,10 +37,6 @@ public class CartFragment extends Fragment {
     RecyclerView ymalRecyclerview;
     TextView textViewBaseAmountIHFTaxPopup;
     TextView textViewTotalTaxIHFTaxPopup;
-    TextView payModeTitleAmountTextView;
-    TextView textViewTotalPayMode;
-    Button closePayModeButton;
-    Button cashButton;
     LinearLayout ihfFCTax;
     LinearLayout continueOrderingButton;
 
@@ -51,6 +47,7 @@ public class CartFragment extends Fragment {
     public static RecyclerViewAdapterYmalList recyclerViewAdapterYmalList;
     Dialog iHFPopUp;
     Dialog payModePopUp;
+    Dialog payModeConfirmationPopUp;
 
     DocumentReference placeOrderDbRef;
 //    int lenOrderId;
@@ -62,10 +59,6 @@ public class CartFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        iHFPopUp = new Dialog(getContext());
-        iHFPopUp.setCanceledOnTouchOutside(true);
-        payModePopUp = new Dialog(getContext());
-        payModePopUp.setCanceledOnTouchOutside(false);
     }
 
 
@@ -139,7 +132,10 @@ public class CartFragment extends Fragment {
         return view;
     }
 
+
     public void showPopUpIHF() {
+        iHFPopUp = new Dialog(getContext());
+        iHFPopUp.setCanceledOnTouchOutside(true);
         iHFPopUp.setContentView(R.layout.ihf_tax_breakup_popup);
 
         recyclerviewIHFTaxPopUp = iHFPopUp.findViewById(R.id.recyclerviewIHFTaxPopUp);
@@ -158,12 +154,14 @@ public class CartFragment extends Fragment {
 
 
     public void showPopUpPayMode() {
+        payModePopUp = new Dialog(getContext());
+        payModePopUp.setCanceledOnTouchOutside(false);
         payModePopUp.setContentView(R.layout.pay_mode_card);
 
-        payModeTitleAmountTextView = payModePopUp.findViewById(R.id.payModeTitleAmountTextView);
-        textViewTotalPayMode = payModePopUp.findViewById(R.id.textViewTotalPayMode);
-        closePayModeButton = payModePopUp.findViewById(R.id.closePayModeButton);
-        cashButton = payModePopUp.findViewById(R.id.cashButton);
+        TextView payModeTitleAmountTextView = payModePopUp.findViewById(R.id.payModeTitleAmountTextView);
+        TextView textViewTotalPayMode = payModePopUp.findViewById(R.id.textViewTotalPayMode);
+        Button closePayModeButton = payModePopUp.findViewById(R.id.closePayModeButton);
+        Button cashButton = payModePopUp.findViewById(R.id.cashButton);
         payModeTitleAmountTextView.setText(Home.formatter.format(Home.orderDetails.get("grandTotal")));
         textViewTotalPayMode.setText(Home.currencyFc + Home.formatter.format(Home.orderDetails.get("grandTotal")));
 
@@ -176,12 +174,40 @@ public class CartFragment extends Fragment {
         cashButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getOrderId();
+                showPopUpPayModeConfirmation();
             }
         });
 
         payModePopUp.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         payModePopUp.show();
+    }
+
+
+    public void showPopUpPayModeConfirmation() {
+        payModeConfirmationPopUp = new Dialog(getContext());
+        payModeConfirmationPopUp.setCanceledOnTouchOutside(false);
+        payModeConfirmationPopUp.setContentView(R.layout.placeorder_confirmation_popup_card);
+
+        Button placeOrderCancelButton = payModeConfirmationPopUp.findViewById(R.id.placeOrderCancelButton);
+        Button placeOrderYesButton = payModeConfirmationPopUp.findViewById(R.id.placeOrderYesButton);
+
+        placeOrderCancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                payModeConfirmationPopUp.dismiss();
+            }
+        });
+        placeOrderYesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                payModeConfirmationPopUp.dismiss();
+                payModePopUp.dismiss();
+                getOrderId();
+            }
+        });
+
+        payModeConfirmationPopUp.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        payModeConfirmationPopUp.show();
     }
 
 
@@ -238,9 +264,9 @@ public class CartFragment extends Fragment {
             placeOrderDbRef.set(Home.cartFCTaxArr.get(i));
         }
 //        Home.home.clearcart();
+        Home.progressDialog.setMessage("Placing Your Order");
+        Home.progressDialog.show();
         Home.orderPlaced = true;
-        payModePopUp.dismiss();
-
         // GOTO ORDERS PAGE
         Home.navigation.setSelectedItemId(R.id.navigation_order);
 //        Home.ft = Home.fragmentManager.beginTransaction();
@@ -275,6 +301,7 @@ public class CartFragment extends Fragment {
 //                        newOrderId = "0" + newOrderId;
 //                    }
                     dbref.update("orderId" , newOrderId );
+                    Log.i("ORDER ID for placed order" , Home.orderId);
                     Home.progressDialog.setMessage("Placing Your Order");
                     Home.progressDialog.show();
 
@@ -320,6 +347,7 @@ public class CartFragment extends Fragment {
             }
         });
     }
+
 
     public void notifyForUpdates() {
         recyclerViewAdapterCartVendorList.notifyDataSetChanged();

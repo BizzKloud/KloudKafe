@@ -1,28 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/circular_corner"
     android:layout_gravity="center"
     android:layout_width="650dp"
     android:layout_height="850dp"
     android:orientation="vertical">
 
-
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="55dp"
-        android:gravity="center"
-        android:text="VENDOR LIST"
-        android:textSize="@dimen/actionbar_title"
-        android:textStyle="bold"
-        android:textColor="@android:color/white"
-        android:background="@color/bizzorange"
-        />
+        style="@style/circular_corners_only_top"
+        android:orientation="horizontal"
+        android:backgroundTint="@color/bizzorange"
+        >
+
+        <TextView
+            android:layout_width="550dp"
+            android:layout_height="55dp"
+            android:gravity="center"
+            android:layout_marginStart="50dp"
+            android:text="VENDOR LIST"
+            android:textSize="@dimen/actionbar_title"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            />
+
+        <Button
+            android:id="@+id/closeChangeVendorButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:background="@drawable/close_icon" />
+
+    </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerviewVendorListChangeVendor"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/lightgrey"
+        android:layout_marginBottom="5dp"
         />
-
+    <!--android:background="@color/lightgrey"-->
 </LinearLayout>

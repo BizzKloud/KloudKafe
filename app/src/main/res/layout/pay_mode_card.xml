@@ -2,7 +2,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/circular_corner"
-    android:layout_width="550dp"
+    android:layout_width="580dp"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:orientation="vertical">
@@ -10,7 +10,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="160dp"
-        style="@style/circular_corner"
+        style="@style/circular_corners_only_top"
         android:orientation="horizontal"
         android:backgroundTint="@color/bizzorange"
         android:weightSum="10">
@@ -26,7 +26,7 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="7"
+            android:layout_weight="6.8"
             android:orientation="horizontal"
             android:layout_marginStart="20dp"
             android:layout_gravity="center">
@@ -35,7 +35,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/pay_paymode"
-                android:textSize="32sp"
+                android:textSize="@dimen/pay_now_card"
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
                 />
@@ -45,7 +45,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="99,99,99,999.00"
-                android:textSize="32sp"
+                android:textSize="@dimen/pay_now_card"
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
                 android:layout_marginStart="7dp"
@@ -56,27 +56,30 @@
         <Button
             android:id="@+id/closePayModeButton"
             android:layout_width="0dp"
-            android:layout_height="38dp"
+            android:layout_height="50dp"
             android:layout_gravity="end"
-            android:layout_marginTop="25dp"
-            android:layout_weight="0.7"
+            android:layout_weight="0.9"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="5dp"
             android:background="@drawable/close_icon" />
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="30dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp">
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="vertical"-->
+        <!--android:layout_marginTop="30dp"-->
+        <!--android:layout_marginStart="20dp"-->
+        <!--android:layout_marginEnd="20dp">-->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:weightSum="2" >
 
             <TextView
@@ -84,7 +87,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="Total Pay"
-                android:textSize="24sp"
+                android:textSize="@dimen/pay_now_card_total"
                 android:textStyle="bold"
                 android:textColor="@color/darkgrey"
                 />
@@ -95,105 +98,108 @@
                 android:layout_height="wrap_content"
                 android:text="$ 99,99,99,999.00"
                 android:gravity="end"
-                android:textSize="24sp"
+                android:textSize="@dimen/pay_now_card_total"
                 android:textStyle="bold"
                 android:textColor="@color/darkgrey"
                 />
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2" >
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:weightSum="2" >-->
 
-            <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:clickable="false"/>
+            <!--<CheckBox-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="center"-->
+                <!--android:clickable="false"/>-->
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.2"
-                android:layout_gravity="center"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/delivery_charges"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/darkgrey"
-                    />
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/text_delivery"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/darkgrey"
-                    />
+            <!--<LinearLayout-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_weight="1.2"-->
+                <!--android:layout_gravity="center"-->
+                <!--android:orientation="vertical">-->
+                <!--<TextView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="@string/delivery_charges"-->
+                    <!--android:textSize="24sp"-->
+                    <!--android:textStyle="bold"-->
+                    <!--android:textColor="@color/darkgrey"-->
+                    <!--/>-->
+                <!--<TextView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="@string/text_delivery"-->
+                    <!--android:textSize="22sp"-->
+                    <!--android:textStyle="bold"-->
+                    <!--android:textColor="@color/darkgrey"-->
+                    <!--/>-->
 
-            </LinearLayout>
+            <!--</LinearLayout>-->
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="0.8"
-                android:layout_height="wrap_content"
-                android:text="@string/table_delivery_charge_rupees"
-                android:gravity="end"
-                android:layout_gravity="center_vertical"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:textColor="@color/darkgrey"
-                />
+            <!--<TextView-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_weight="0.8"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="@string/table_delivery_charge_rupees"-->
+                <!--android:gravity="end"-->
+                <!--android:layout_gravity="center_vertical"-->
+                <!--android:textSize="22sp"-->
+                <!--android:textStyle="bold"-->
+                <!--android:textColor="@color/darkgrey"-->
+                <!--/>-->
 
-        </LinearLayout>
+        <!--</LinearLayout>-->
 
-        </LinearLayout>
+        <!--</LinearLayout>-->
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/select_payment_method"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_gravity="center"
-        android:layout_marginTop="45dp"/>
+    <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/select_payment_method"-->
+        <!--android:textSize="24sp"-->
+        <!--android:textStyle="bold"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:layout_marginTop="45dp"/>-->
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:layout_marginTop="10dp"
-        android:weightSum="2"
+        android:layout_height="180dp"
         android:orientation="horizontal">
+        <!--android:weightSum="2"-->
 
-        <Button
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:drawableTop="@drawable/credit_card_white_icon"
-            android:drawablePadding="0dp"
-            android:text="CARD"
-            android:textStyle="bold"
-            android:textSize="27sp"
-            android:textColor="@android:color/white"/>
+        <!--<Button-->
+            <!--android:layout_weight="1"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:drawableTop="@drawable/credit_card_white_icon"-->
+            <!--android:drawablePadding="0dp"-->
+            <!--android:text="CARD"-->
+            <!--android:textStyle="bold"-->
+            <!--android:textSize="27sp"-->
+            <!--android:textColor="@android:color/white"/>-->
 
         <Button
             android:id="@+id/cashButton"
+            style="@style/circular_corner"
+            android:backgroundTint="@color/bizzlightblue"
             android:gravity="center"
             android:layout_weight="1"
             android:layout_width="0dp"
+            android:layout_margin="28dp"
             android:layout_height="match_parent"
-            android:drawableTop="@drawable/rupee_icon"
             android:drawablePadding="0dp"
-            android:text="CASH"
+            android:text="PLACE ORDER"
             android:textStyle="bold"
-            android:textSize="27sp"
+            android:textSize="38sp"
             android:textColor="@android:color/white"/>
+
+        <!--android:drawableTop="@drawable/rupee_icon"-->
 
     </LinearLayout>
 

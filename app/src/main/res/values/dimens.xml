@@ -15,9 +15,12 @@
     <dimen name= "ymal_title">12sp</dimen>
     <dimen name= "continue_ordering">28sp</dimen>
     <dimen name= "pay_now">32sp</dimen>
+    <dimen name= "pay_now_card">32sp</dimen>
+    <dimen name= "pay_now_card_total">25sp</dimen>
     <dimen name= "ihf_cart">20sp</dimen>
     <dimen name= "taxbreakup_label_and_amount">20sp</dimen>
     <dimen name= "fooditem_name_menu">24sp</dimen>
     <dimen name= "fooditem_sdesp_menu">22sp</dimen>
     <dimen name= "fooditem_amount_menu">22sp</dimen>
+    <dimen name= "notification">26sp</dimen>
 </resources>

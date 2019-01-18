@@ -204,6 +204,7 @@
             android:layout_marginTop="50dp"
             android:onClick="authenticate"
             android:text="AUTHENTICATE"
+            android:textStyle="bold"
             android:textColor="@android:color/background_light"
             android:textSize="30sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -248,6 +249,7 @@
             android:text="CONTINUE"
             android:textColor="@android:color/background_light"
             android:textSize="30sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent" />
@@ -345,6 +347,7 @@
             android:text="ACTIVATE"
             android:textColor="@android:color/background_light"
             android:textSize="30sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent" />
