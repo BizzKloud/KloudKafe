@@ -96,6 +96,7 @@ public class Login extends AppCompatActivity {
     int posfc;
     int posadmin;
     int postable;
+    HashMap tableDetails = new HashMap();
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
 
@@ -107,6 +108,7 @@ public class Login extends AppCompatActivity {
 
 
         checkInternetConnection();
+
 
 //        FIRESTORE
         firestore = FirebaseFirestore.getInstance();
@@ -258,17 +260,17 @@ public class Login extends AppCompatActivity {
 
 
         HashMap basicDetails = new HashMap();
-        basicDetails.put("adminId" , adminArr.get(adminSpnr.getSelectedItemPosition()-1).get("usrid").toString() );
-        basicDetails.put("empid" , adminArr.get(adminSpnr.getSelectedItemPosition()-1).get("empid").toString() );
-        basicDetails.put("displayName" , employeeArr.get(adminSpnr.getSelectedItemPosition()-1).get("displayName").toString()  );
-        basicDetails.put("tabid" , tableArr.get(tableSpnr.getSelectedItemPosition()-1).get("tabid").toString()  );
-        basicDetails.put("tableName" , tableArr.get(tableSpnr.getSelectedItemPosition()-1).get("name").toString()  );
+        basicDetails.put("adminId" , adminArr.get(posadmin).get("usrid").toString() );
+        basicDetails.put("empid" , adminArr.get(posadmin).get("empid").toString() );
+        basicDetails.put("displayName" , employeeArr.get(posadmin).get("displayName").toString()  );
+        basicDetails.put("tabid" , tableDetails.get("tabid").toString()  );
+        basicDetails.put("tableName" , tableDetails.get("name").toString()  );
 
         Intent home = new Intent(this, Home.class);
         home.putExtra("fcDetails" , foodCourtArr.get(posfc));
         home.putExtra("adminDetails" , adminArr.get(posadmin));
         home.putExtra("employeeDetails" , employeeArr.get(posadmin));
-        home.putExtra("tableDetails" , tableArr.get(postable));
+        home.putExtra("tableDetails" , tableDetails);
         home.putExtra("basicDetails" , basicDetails);
 
         startActivity(home);
@@ -280,13 +282,13 @@ public class Login extends AppCompatActivity {
                 .addOnSuccessListener(this, new  OnSuccessListener<AuthResult>() {
             @Override
             public void onSuccess(AuthResult authResult) {
-                Log.i("signInAnonymously: SUCCESS ", "TRUE");
+//                Log.i("signInAnonymously: SUCCESS ", "TRUE");
             }
         })
                 .addOnFailureListener(this, new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
-                        Log.i("signInAnonymously:FAILURE", exception.toString());
+//                        Log.i("signInAnonymously:FAILURE", exception.toString());
                     }
         });
     }
@@ -299,7 +301,7 @@ public class Login extends AppCompatActivity {
         progressDialog.show();
         progressDialog.setCanceledOnTouchOutside(false);
 
-        Log.i("Login" , "Clicked");
+//        Log.i("Login" , "Clicked");
         String password = passEditText.getText().toString().trim();
         if(foodcourtSpnr.getSelectedItem() == "Select Food Court") {
             progressDialog.dismiss();
@@ -355,10 +357,10 @@ public class Login extends AppCompatActivity {
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     if(task.isSuccessful()) {
                         HashMap check = (HashMap) task.getResult().getData();
-                        Log.i("CHECK TABLE STATUS" , check.get("status").toString());
+//                        Log.i("CHECK TABLE STATUS" , check.get("status").toString());
                         if(!(Boolean) check.get("status")) {
-                            DocumentReference currentTable = db.document(path);
-//                            currentTable.update("status", true); add on sucess listner
+                            tableDetails = tableArr.get(postable);
+                            db.document(path).update("status", true);
                             progressDialog.dismiss();
 
                             // Change UI to Table
@@ -377,7 +379,7 @@ public class Login extends AppCompatActivity {
                     }
                     else {
                         Toast.makeText(Login.this, "ERROR LOGING IN.", Toast.LENGTH_SHORT).show();
-                        Log.i("CHECK TABLE STATUS" , "FAILED to check");
+//                        Log.i("CHECK TABLE STATUS" , "FAILED to check");
                     }
                 }
             });
@@ -412,11 +414,13 @@ public class Login extends AppCompatActivity {
 
             @Override
             public boolean isEnabled(int position) {
-                if (position == 0) {
-                    return false;
-                } else {
-                    return true;
-                }
+                return position != 0;
+
+//                if (position == 0) {
+//                    return false;
+//                } else {
+//                    return true;
+//                }
             }
 
             @Override
@@ -459,7 +463,7 @@ public class Login extends AppCompatActivity {
                         }
 
                         new AsysncTask().execute("EmployeeM");
-                        Log.i("Admin Array" , adminArr.toString());
+//                        Log.i("Admin Array" , adminArr.toString());
                     }
                 });
 
@@ -518,7 +522,7 @@ public class Login extends AppCompatActivity {
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
 
                         if(e != null) {
-                            Log.i("ERROR" , e.getMessage());
+//                            Log.i("ERROR" , e.getMessage());
                             Toast.makeText(Login.this, e.toString() , Toast.LENGTH_LONG).show();
                         }else {
                             foodCourtArr.clear();
@@ -529,7 +533,7 @@ public class Login extends AppCompatActivity {
                             //Initialize
                             Boolean label = true;
                             fcNames = setnames(fcNames, foodCourtArr, label );
-                            Log.i("FCNAME" , fcNames.toString());
+//                            Log.i("FCNAME" , fcNames.toString());
                             foodcourtSpnr.setAdapter(initSpinner(fcNames));
                             adapterfc.notifyDataSetChanged();
                             adminSpnr.setAdapter(initSpinner(adminNames));

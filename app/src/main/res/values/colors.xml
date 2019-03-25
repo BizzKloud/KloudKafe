@@ -11,6 +11,8 @@
     <color name="lightgrey">#e6e6e6</color>
     <color name="darkgrey">#606060</color>
     <color name="rupeegreen">#328926</color>
+    <color name="checkgreen">#5BBD26</color>
     <color name="white">#ffffff</color>
     <color name="red">#FF2B2B</color>
+    <color name="transparent">#00FF2B2B</color>
 </resources>

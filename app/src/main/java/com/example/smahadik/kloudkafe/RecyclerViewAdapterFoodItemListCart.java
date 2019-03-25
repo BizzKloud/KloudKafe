@@ -92,6 +92,9 @@ public class RecyclerViewAdapterFoodItemListCart extends RecyclerView.Adapter<Re
                 if(quantity <= 15 ) {
                     Home.progressDialog.setMessage("Please Wait..");
                     Home.progressDialog.show();
+                    Home.cartCounter++;
+                    Home.cartCounterTextView.setText(String.valueOf(Home.cartCounter));
+
                     Home.cartArr.get(cartvenpos).get(position).put("quantity", quantity );
                     holder.textViewFoodItemQuantity.setText(String.valueOf(quantity));
                     updates(holder, position);
@@ -100,8 +103,8 @@ public class RecyclerViewAdapterFoodItemListCart extends RecyclerView.Adapter<Re
                     Toast.makeText(context, "Item Quantity MAX limit Reached", Toast.LENGTH_SHORT).show();
                 }
 
-                Home.cartCounter++;
-                Home.cartCounterTextView.setText(String.valueOf(Home.cartCounter));
+                Home.home.setAdvCounter();
+                Home.progressDialog.dismiss();
             }
         });
 
@@ -113,6 +116,7 @@ public class RecyclerViewAdapterFoodItemListCart extends RecyclerView.Adapter<Re
                 if(quantity > 0) {
                     Home.progressDialog.setMessage("Please Wait..");
                     Home.progressDialog.show();
+                    Home.home.setAdvCounter();
 
                     Home.cartArr.get(cartvenpos).get(position).put("quantity", quantity );
                     holder.textViewFoodItemQuantity.setText(String.valueOf(quantity));
@@ -121,13 +125,14 @@ public class RecyclerViewAdapterFoodItemListCart extends RecyclerView.Adapter<Re
 
                     Home.cartCounter--;
                     Home.cartCounterTextView.setText(String.valueOf(Home.cartCounter));
+                    Home.progressDialog.dismiss();
 
                 }else if(quantity == 0){
                     Home.progressDialog.setMessage("Please Wait..");
                     Home.progressDialog.show();
                     home.removefromcart(foodItemCart);
                     cartFragment.notifyForUpdates();
-                    Toast.makeText(context, "Food Item Removed from Cart", Toast.LENGTH_SHORT).show();
+                    Home.progressDialog.dismiss();
                 }
             }
         });

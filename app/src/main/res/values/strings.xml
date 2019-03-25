@@ -14,7 +14,7 @@
     <string name="may">M\nA\nY</string>
     <string name="also">A\nL\nS\nO</string>
     <string name="like">L\nI\nK\nE</string>
-    <string name="pay_paymode">Pay ₹.</string>
+    <string name="pay_paymode">Pay : </string>
     <string name="delivery_charges">Table Delivery Charges</string>
     <string name="text_delivery">* Select to get food delivered to your Table</string>
     <string name="table_delivery_charge_rupees">+ \u20B9 0.00</string>

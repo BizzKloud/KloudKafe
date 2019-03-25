@@ -58,7 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="3.8"
             android:layout_marginStart="7dp"
-            android:text="₹ 0"
+            android:text=""
             android:textColor="@color/rupeegreen"
             android:layout_gravity="center_vertical"
             android:textSize="@dimen/fooditem_amount_cart"/>

@@ -55,8 +55,9 @@
             android:layout_height="0dp"
             android:layout_weight="7"
             android:background="@color/lightgrey"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
             />
-
 
     </LinearLayout>
 

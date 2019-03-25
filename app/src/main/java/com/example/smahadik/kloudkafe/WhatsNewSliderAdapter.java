@@ -1,6 +1,7 @@
 package com.example.smahadik.kloudkafe;
 
 import android.content.Context;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -84,15 +85,25 @@ public class WhatsNewSliderAdapter extends PagerAdapter{
             public void onClick(View v) {
                 //Add or Remove  to/from Cart
                 if(home.checkFoodIteminCart(whatsNewFoodItemHashMap)) {
+                    Home.progressDialog.setMessage("Removing Food Item from your Cart");
                     addtocartWhatsNew.setImageResource(R.drawable.addtocart_icon);
                     home.removefromcart(whatsNewFoodItemHashMap);
                 }else {
                     HashMap foodItemFound =  home.findFoodItem(whatsNewFoodItemHashMap);
                     if(foodItemFound != null) {
+                        Home.progressDialog.setMessage("Adding Food Item to your Cart");
                         home.addtocart(foodItemFound);
                         addtocartWhatsNew.setImageResource(R.drawable.addedtocart_icon);
                     }
                 }
+                new CountDownTimer(1000, 1000) {
+                    @Override
+                    public void onTick(long millisUntilFinished) { }
+                    @Override
+                    public void onFinish() {
+                        Home.progressDialog.dismiss();
+                    }
+                }.start();
             }
         });
 
@@ -100,27 +111,6 @@ public class WhatsNewSliderAdapter extends PagerAdapter{
         return view;
 
     }
-
-
-//    public boolean checkFoodIteminCart(HashMap fooditem) {
-//        if(Home.cartArr.size() > 0) {
-//            for(int i=0; i<Home.cartArr.size(); i++) {
-//                if(Home.cartArr.get(i).get(0).get("venid").toString().equals(fooditem.get("venid").toString())) {
-//                    //found Venid- vendor
-//                    for(int j=0; j<Home.cartArr.get(i).size(); j++) {
-//                        if(Home.cartArr.get(i).get(j).get("fdid").toString().equals(fooditem.get("fdid").toString())
-//                                && Home.cartArr.get(i).get(j).get("catid").toString().equals(fooditem.get("catid").toString()) ) {
-//                            // found fdid- foodItem
-//                            Log.i("Food Item At WhatsNew" , "FOUND");
-//                            return true;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        Log.i("Food Item At WhatsNew" , "NOT FOUND");
-//        return false;
-//    }
 
 
     @Override

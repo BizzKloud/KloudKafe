@@ -62,6 +62,7 @@ public class RecyclerViewAdapterCartVendorList extends RecyclerView.Adapter<Recy
             holder.vendorTax.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Home.home.setAdvCounter();
                     showPopUp(holder, position);
                 }
             });
@@ -108,7 +109,7 @@ public class RecyclerViewAdapterCartVendorList extends RecyclerView.Adapter<Recy
         LinearLayout totalAndTaxLayout;
         TextView textViewVendorTax;
         TextView textViewVendorSubTotal;
-        Dialog vendorTaxPopUp;
+        public static Dialog vendorTaxPopUp;
         RecyclerView recyclerviewVendorTaxPopUp;
         TextView textViewBaseAmountVendorTaxPopup;
         TextView textViewTotalTaxVendorTaxPopup;

@@ -40,6 +40,7 @@ public class RecyclerViewAdapterFoodItemList extends RecyclerView.Adapter<Recycl
     View view;
     StorageReference fooditemStorageRef;
     Home home = new Home();
+    public static Dialog imageEnlargeDialog;
 
 
 
@@ -94,11 +95,11 @@ public class RecyclerViewAdapterFoodItemList extends RecyclerView.Adapter<Recycl
                 //Add or Remove  to/from Cart
 
                 if(home.checkFoodIteminCart(foodItemHashMap)) {
-                    Home.progressDialog.setMessage("Adding Food Item to your Cart");
+                    Home.progressDialog.setMessage("Removing Food Item from your Cart");
                     holder.addtocartMenu.setImageResource(R.drawable.addtocart_blueicon);
                     home.removefromcart(foodItemHashMap);
                 }else {
-                    Home.progressDialog.setMessage("Removing Food Item from your Cart");
+                    Home.progressDialog.setMessage("Adding Food Item to your Cart");
                     holder.addtocartMenu.setImageResource(R.drawable.addedtocart_orangeicon);
                     home.addtocart(foodItemHashMap);
                 }
@@ -119,6 +120,7 @@ public class RecyclerViewAdapterFoodItemList extends RecyclerView.Adapter<Recycl
         holder.imageViewFoodItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Home.home.setAdvCounter();
                 showEnlargeImage(foodItemHashMap);
             }
         });
@@ -127,7 +129,7 @@ public class RecyclerViewAdapterFoodItemList extends RecyclerView.Adapter<Recycl
 
 
     public void showEnlargeImage(HashMap foodItemHashMap) {
-        Dialog imageEnlargeDialog = new Dialog(context);
+        imageEnlargeDialog = new Dialog(context);
         imageEnlargeDialog.setContentView(R.layout.image_enlarge_cardview);
 
         ImageView imageViewEnlargeImage = imageEnlargeDialog.findViewById(R.id.imageViewEnlargeImage);

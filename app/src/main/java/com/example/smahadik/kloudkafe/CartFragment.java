@@ -2,10 +2,14 @@ package com.example.smahadik.kloudkafe;
 
 import android.app.Dialog;
 import android.app.Fragment;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.hardware.display.DisplayManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -45,9 +49,9 @@ public class CartFragment extends Fragment {
     public static TextView textViewGrandTotal;
     public static RecyclerViewAdapterCartVendorList recyclerViewAdapterCartVendorList;
     public static RecyclerViewAdapterYmalList recyclerViewAdapterYmalList;
-    Dialog iHFPopUp;
-    Dialog payModePopUp;
-    Dialog payModeConfirmationPopUp;
+    public static Dialog iHFPopUp;
+    public static Dialog payModePopUp;
+    public static Dialog payModeConfirmationPopUp;
 
     DocumentReference placeOrderDbRef;
 //    int lenOrderId;
@@ -88,7 +92,9 @@ public class CartFragment extends Fragment {
         ihfFCTax.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(Home.cartArr.size() > 0) { showPopUpIHF(); }
+                if(Home.cartArr.size() > 0) {
+                    Home.home.setAdvCounter();
+                    showPopUpIHF(); }
             }
         });
 
@@ -96,7 +102,11 @@ public class CartFragment extends Fragment {
         paynowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(Home.cartArr.size() > 0) { showPopUpPayMode(); }
+                if(Home.cartArr.size() > 0) {
+                    Home.home.setAdvCounter();
+                    showPopUpPayMode();
+                    Home.home.setClearCartCounter();
+                }
             }
         });
 
@@ -105,6 +115,7 @@ public class CartFragment extends Fragment {
             public void onClick(View v) {
                 // continue ordering
 //                Log.i("Continue Ordering" , "vendor POS: " + Home.lastVendorPosition );
+                Home.home.setAdvCounter();
                 if (Home.navigation.getSelectedItemId() == R.id.navigation_menu) {
                     VendorItemListFragment.drawerLayout.closeDrawer(Gravity.END);
                 }
@@ -162,18 +173,22 @@ public class CartFragment extends Fragment {
         TextView textViewTotalPayMode = payModePopUp.findViewById(R.id.textViewTotalPayMode);
         Button closePayModeButton = payModePopUp.findViewById(R.id.closePayModeButton);
         Button cashButton = payModePopUp.findViewById(R.id.cashButton);
-        payModeTitleAmountTextView.setText(Home.formatter.format(Home.orderDetails.get("grandTotal")));
+        payModeTitleAmountTextView.setText(Home.currencyFc + Home.formatter.format(Home.orderDetails.get("grandTotal")));
         textViewTotalPayMode.setText(Home.currencyFc + Home.formatter.format(Home.orderDetails.get("grandTotal")));
 
         closePayModeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Home.home.setAdvCounter();
                 payModePopUp.dismiss();
             }
         });
         cashButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Home.home.setAdvCounter();
+                payModePopUp.dismiss();
+                Home.clearCartStandbyTimer.cancel();
                 showPopUpPayModeConfirmation();
             }
         });
@@ -184,30 +199,42 @@ public class CartFragment extends Fragment {
 
 
     public void showPopUpPayModeConfirmation() {
-        payModeConfirmationPopUp = new Dialog(getContext());
-        payModeConfirmationPopUp.setCanceledOnTouchOutside(false);
-        payModeConfirmationPopUp.setContentView(R.layout.placeorder_confirmation_popup_card);
 
-        Button placeOrderCancelButton = payModeConfirmationPopUp.findViewById(R.id.placeOrderCancelButton);
-        Button placeOrderYesButton = payModeConfirmationPopUp.findViewById(R.id.placeOrderYesButton);
+        // INTERNET CONNECTION
+        ConnectivityManager conMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = conMgr.getActiveNetworkInfo();
+        if (netInfo != null && netInfo.isConnected()){
+            payModeConfirmationPopUp = new Dialog(getContext());
+            payModeConfirmationPopUp.setCanceledOnTouchOutside(false);
+            payModeConfirmationPopUp.setContentView(R.layout.placeorder_confirmation_popup_card);
 
-        placeOrderCancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                payModeConfirmationPopUp.dismiss();
-            }
-        });
-        placeOrderYesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                payModeConfirmationPopUp.dismiss();
-                payModePopUp.dismiss();
-                getOrderId();
-            }
-        });
+            Button placeOrderCancelButton = payModeConfirmationPopUp.findViewById(R.id.placeOrderCancelButton);
+            Button placeOrderYesButton = payModeConfirmationPopUp.findViewById(R.id.placeOrderYesButton);
 
-        payModeConfirmationPopUp.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        payModeConfirmationPopUp.show();
+            placeOrderCancelButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Home.home.setAdvCounter();
+                    payModeConfirmationPopUp.dismiss();
+                }
+            });
+            placeOrderYesButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Home.home.setAdvCounter();
+                    payModeConfirmationPopUp.dismiss();
+                    payModePopUp.dismiss();
+                    getOrderId();
+                }
+            });
+
+            payModeConfirmationPopUp.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            payModeConfirmationPopUp.show();
+
+        } else {
+            Toast.makeText(getContext(), "Check INTERNET Connection", Toast.LENGTH_LONG).show();
+        }
+
     }
 
 
@@ -220,11 +247,11 @@ public class CartFragment extends Fragment {
     public void placeOrder() {
 
         placeOrderDbRef = Home.dbTransaction.document(Home.todaysDate).collection(Home.orderId).document("Total");
-        Log.i("cart Array" , Home.cartArr.toString());
-        Log.i("cart Vendor Array" , Home.cartVendorArr.toString());
-        Log.i("cart vendor tax Array" , Home.cartVendorTaxArr.toString());
-        Log.i("cart FC tax Array" , Home.cartFCTaxArr.toString());
-        Log.i("cart order details Array" , Home.orderDetails.toString());
+//        Log.i("cart Array" , Home.cartArr.toString());
+//        Log.i("cart Vendor Array" , Home.cartVendorArr.toString());
+//        Log.i("cart vendor tax Array" , Home.cartVendorTaxArr.toString());
+//        Log.i("cart FC tax Array" , Home.cartFCTaxArr.toString());
+//        Log.i("cart order details Array" , Home.orderDetails.toString());
 
         placeOrderDbRef.set(Home.orderDetails);
 
@@ -268,7 +295,13 @@ public class CartFragment extends Fragment {
         Home.progressDialog.show();
         Home.orderPlaced = true;
         // GOTO ORDERS PAGE
-        Home.navigation.setSelectedItemId(R.id.navigation_order);
+        new CountDownTimer(4000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) { }
+
+            @Override
+            public void onFinish() { Home.navigation.setSelectedItemId(R.id.navigation_order); }
+        }.start();
 //        Home.ft = Home.fragmentManager.beginTransaction();
 //        Home.ft.replace(R.id.rootLayout, new OrdersPageFragment());
 //        Home.ft.commit();
@@ -285,10 +318,10 @@ public class CartFragment extends Fragment {
                     DocumentSnapshot document = task.getResult();
                     DocumentReference dbref = Home.firestore.document("transactions/" + Home.fcDetails.get("fcid").toString());
                     if (document.exists()) {
-                        Log.i("Doc exists" , "DocumentSnapshot data: " + document.getData());
+//                        Log.i("Doc exists" , "DocumentSnapshot data: " + document.getData());
                         Home.orderId = document.get("orderId").toString();
                     } else {
-                        Log.i("Doc not exists " ,"Doc Created");
+//                        Log.i("Doc not exists " ,"Doc Created");
                         dbref.set(Home.fcDetails);
                         Home.orderId = "000000001";
                     }
@@ -301,7 +334,7 @@ public class CartFragment extends Fragment {
 //                        newOrderId = "0" + newOrderId;
 //                    }
                     dbref.update("orderId" , newOrderId );
-                    Log.i("ORDER ID for placed order" , Home.orderId);
+//                    Log.i("ORDER ID for placed order" , Home.orderId);
                     Home.progressDialog.setMessage("Placing Your Order");
                     Home.progressDialog.show();
 
@@ -313,7 +346,7 @@ public class CartFragment extends Fragment {
 
                     placeOrder();
                 } else {
-                    Log.i("Doc not exists --  ERROR " , "No such document");
+//                    Log.i("Doc not exists --  ERROR " , "No such document");
                     Toast.makeText(getContext(), "ERROR getting ORDER-ID", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -332,7 +365,7 @@ public class CartFragment extends Fragment {
                     if (document.exists()) {
                         Log.i("TODAYS DATE-Doc exists" , "DocumentSnapshot data: " + document.getData());
                     } else {
-                        Log.i("TODAYS DATE-Doc NOT exists" , "DocumentSnapshot data = CREATED ");
+//                        Log.i("TODAYS DATE-Doc NOT exists" , "DocumentSnapshot data = CREATED ");
                         HashMap dates = new HashMap();
                         dates.put("sOrderId" , Home.orderId);
                         dates.put("eOrderId" , Home.orderId);
@@ -340,7 +373,7 @@ public class CartFragment extends Fragment {
                     }
                     Home.checkStartOrderID = false;
                 } else {
-                    Log.i("ERROR - TODAYS DATE-Doc NOT exists" , "DocumentSnapshot data = CREATED ");
+//                    Log.i("ERROR - TODAYS DATE-Doc NOT exists" , "DocumentSnapshot data = CREATED ");
                     Toast.makeText(getContext(), "ERROR getting ORDER-ID", Toast.LENGTH_SHORT).show();
                 }
 

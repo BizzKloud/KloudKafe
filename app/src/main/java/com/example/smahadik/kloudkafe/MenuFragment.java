@@ -80,7 +80,7 @@ public class MenuFragment extends Fragment {
 
 
         if(handler == null) {
-            Log.i("Handler" , "Created NEW");
+//            Log.i("Handler" , "Created NEW");
             handler = new Handler();
             handler.postDelayed(runnable, 0);
         }
@@ -101,7 +101,7 @@ public class MenuFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        Log.i("MENU" , " RESUMED TRUE");
+//        Log.i("MENU" , " RESUMED TRUE");
         if(!Home.whatsNewArr.isEmpty()) {
             if (!runnableRunning) {
                 position = 0;
@@ -127,16 +127,16 @@ public class MenuFragment extends Fragment {
             position++;
             if (position == Home.whatsNewArr.size()) {
                 position = 0;
-                Log.i("MENU Position CHANGED" , String.valueOf(position) );
+//                Log.i("MENU Position CHANGED" , String.valueOf(position) );
 
             }
             if(!cancelled) {
-                Log.i("Runnable WhatsNew", "NOt Cancelled");
+//                Log.i("Runnable WhatsNew", "NOt Cancelled");
                 runnableRunning = true;
                 handler.postDelayed(this, whatsNewTimer);
             }else {
                 runnableRunning = false;
-                Log.i("Runnable WhatsNew", "Cancelled");
+//                Log.i("Runnable WhatsNew", "Cancelled");
             }
         }
 
@@ -165,14 +165,16 @@ public class MenuFragment extends Fragment {
     // Setting Up DotsLayout
     public void setDotsLayout(int pos) {
 
-        dotsLayout.removeAllViews();
-        for(int i=0; i<Home.whatsNewArr.size(); i++) {
-            dots[i] = new ImageView(getContext());
-            dots[i].setImageResource(R.drawable.smallcirclegrey);
-            dotsLayout.addView(dots[i]);
-        }
+        if(!MenuFragment.cancelled) {
+            dotsLayout.removeAllViews();
+            for(int i=0; i<Home.whatsNewArr.size(); i++) {
+                dots[i] = new ImageView(getContext());
+                dots[i].setImageResource(R.drawable.smallcirclegrey);
+                dotsLayout.addView(dots[i]);
+            }
 
-        dots[pos].setImageResource(R.drawable.smallcirclewhite);
+            dots[pos].setImageResource(R.drawable.smallcirclewhite);
+        }
     }
     public void setDotsLayout(int pos, Context context) {
 

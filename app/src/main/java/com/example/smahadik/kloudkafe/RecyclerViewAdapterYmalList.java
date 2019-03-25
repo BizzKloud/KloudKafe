@@ -2,6 +2,7 @@ package com.example.smahadik.kloudkafe;
 
 import android.content.Context;
 import android.media.Image;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -81,6 +82,7 @@ public class RecyclerViewAdapterYmalList extends RecyclerView.Adapter<RecyclerVi
                     //Add or Remove  to/from Cart
                     if(home.checkFoodIteminCart(foodItem)) {
 //                        Log.i("Removing ymal" , foodItem.toString());
+                        Home.progressDialog.setMessage("Removing Food Item from your Cart");
                         holder.radioButtonYmal.setChecked(false);
                         home.removefromcart(foodItem);
                         cartFragment.notifyForUpdates();
@@ -88,18 +90,27 @@ public class RecyclerViewAdapterYmalList extends RecyclerView.Adapter<RecyclerVi
                         HashMap foodItemFound =  home.findFoodItem(foodItem);
                         if(foodItemFound != null) {
 //                            Log.i("Adding ymal" , foodItem.toString());
+                            Home.progressDialog.setMessage("Adding Food Item to your Cart");
                             holder.radioButtonYmal.setChecked(true);
                             home.addtocart(foodItem);
                             cartFragment.notifyForUpdates();
                         }
                     }
+                    new CountDownTimer(1000, 1000) {
+                        @Override
+                        public void onTick(long millisUntilFinished) { }
+                        @Override
+                        public void onFinish() {
+                            Home.progressDialog.dismiss();
+                        }
+                    }.start();
                 }
             });
 
             holder.radioButtonYmal.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.i("Called in Click from......" , "Radio Button");
+//                    Log.i("Called in Click from......" , "Radio Button");
                     holder.ymalLinearLayout.callOnClick();
                 }
             });

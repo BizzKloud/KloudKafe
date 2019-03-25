@@ -75,14 +75,14 @@ public class VendorItemListFragment extends Fragment{
         textViewvendorNameTitle = toolbar.findViewById(R.id.textViewvendorNameTitle);
         drawerLayout = view.findViewById(R.id.drawerLayout);
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-        Log.i("Called again" , "TRUE");
+//        Log.i("Called again" , "TRUE");
 
         textViewvendorNameTitle.setText(Home.vendorArr.get(Home.vendorPosition).get("name").toString());
 
         backButtontoMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("BACK BUTTON PRESSED" , "ON MAIN MENU");
+//                Log.i("BACK BUTTON PRESSED" , "ON MAIN MENU");
                 home.stopImageSwitcher(true , false);
                 Home.vendorPosition = -1;
                 Home.lastVendorPosition = -1;
@@ -91,12 +91,14 @@ public class VendorItemListFragment extends Fragment{
                 Fragment frag =  getFragmentManager().findFragmentByTag(fragment.getClass().getName());
                 Home.ft.replace(R.id.rootLayout, frag);
                 Home.ft.commit();
+                Home.home.setAdvCounter();
             }
         });
 
         changeVendorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Home.home.setAdvCounter();
                 showPopupChangeVendor();
             }
         });
@@ -108,7 +110,7 @@ public class VendorItemListFragment extends Fragment{
                 Home.progressDialog.show();
                 venpos = Home.vendorPosition;
                 lastvenpos = Home.lastVendorPosition;
-                Log.i("Called Opened", String.valueOf(lastvenpos) );
+//                Log.i("Called Opened", String.valueOf(lastvenpos) );
                 Home.catPosition = foodItemListViewPager.getCurrentItem();
 
                 FragmentManager fragmentManager = getFragmentManager();
@@ -127,9 +129,8 @@ public class VendorItemListFragment extends Fragment{
                 Home.lastVendorPosition = lastvenpos;
                 setupViewPager();
                 foodItemListViewPager.setCurrentItem(Home.catPosition);
-
-                Log.i("Called Closed", String.valueOf(lastvenpos) );
-                Log.i("Called Closed cat", String.valueOf(Home.catPosition) );
+//                Log.i("Called Closed", String.valueOf(lastvenpos) );
+//                Log.i("Called Closed cat", String.valueOf(Home.catPosition) );
                 Home.progressDialog.dismiss();
                 super.onDrawerClosed(drawerView);
             }
@@ -161,7 +162,9 @@ public class VendorItemListFragment extends Fragment{
         Button closeChangeVendorButton = changeVendorPopUp.findViewById(R.id.closeChangeVendorButton);
         closeChangeVendorButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) { changeVendorPopUp.dismiss();
+            public void onClick(View v) {
+                changeVendorPopUp.dismiss();
+                Home.home.setAdvCounter();
             }
         });
 

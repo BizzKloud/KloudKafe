@@ -3,26 +3,13 @@ package com.example.smahadik.kloudkafe;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
-import com.firebase.ui.storage.images.FirebaseImageLoader;
-import com.google.firebase.storage.StorageReference;
-
-import static java.security.AccessController.getContext;
 
 public class CategorySliderAdapter extends PagerAdapter {
 
@@ -60,6 +47,7 @@ public class CategorySliderAdapter extends PagerAdapter {
         recyclerviewFoodItemList.setLayoutManager(new GridLayoutManager(context , 1));
         recyclerviewFoodItemList.setAdapter(recyclerViewAdapterFoodItemList);
 
+//        Home.home.setAdvCounter();
         container.addView(view);
         return view;
 

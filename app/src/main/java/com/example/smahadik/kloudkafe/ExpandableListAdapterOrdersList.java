@@ -26,7 +26,7 @@ import java.util.LinkedHashMap;
 
 public class ExpandableListAdapterOrdersList extends BaseExpandableListAdapter {
 
-    public Context context;
+    Context context;
     private ArrayList <LinkedHashMap> vendorOrderList;
     private ArrayList<ArrayList<LinkedHashMap>> foodItemOrderList;
     LayoutInflater infalInflater;
@@ -35,7 +35,7 @@ public class ExpandableListAdapterOrdersList extends BaseExpandableListAdapter {
     StorageReference storageRefFoodItemImage;
 
 
-    public ExpandableListAdapterOrdersList (Context context, ArrayList <LinkedHashMap> vendorOrderList, ArrayList<ArrayList<LinkedHashMap>> foodItemOrderList) {
+    ExpandableListAdapterOrdersList (Context context, ArrayList <LinkedHashMap> vendorOrderList, ArrayList<ArrayList<LinkedHashMap>> foodItemOrderList) {
 
         this.context = context;
         this.vendorOrderList = vendorOrderList;
@@ -81,7 +81,6 @@ public class ExpandableListAdapterOrdersList extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
         HashMap vendor = (HashMap) getGroup(groupPosition);
-
         if (convertView == null) {
             infalInflaterheader = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             if (infalInflaterheader != null) {
@@ -102,7 +101,6 @@ public class ExpandableListAdapterOrdersList extends BaseExpandableListAdapter {
         String pic = vendor.get("pic").toString();
         storageRefVenImage = Home.storageRef.child(pic);
         Glide.with(venImageOrdersList.getContext()).using(new FirebaseImageLoader()).load(storageRefVenImage)
-//                .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
                 .listener(new RequestListener<StorageReference, GlideDrawable>() {
                     @Override
                     public boolean onException(Exception e, StorageReference model, Target<GlideDrawable> target, boolean isFirstResource) {
@@ -121,16 +119,31 @@ public class ExpandableListAdapterOrdersList extends BaseExpandableListAdapter {
 
         switch (vendor.get("orderStatus").toString()) {
 
+            case "OPEN":
+                textViewOrderList1.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.transparent));
+                textViewOrderList1.setTextColor(ContextCompat.getColor(context, R.color.bizzorange));
+                textViewOrderList2.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.transparent));
+                textViewOrderList2.setTextColor(ContextCompat.getColor(context, R.color.bizzorange));
+                textViewOrderListStatus1.setText("Order Accepted");
+                textViewOrderListStatus2.setText("Ready to Pick");
+                break;
+
             case "ACCEPTED":
                 textViewOrderList1.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.bizzorange));
                 textViewOrderList1.setTextColor(ContextCompat.getColor(context, R.color.white));
+                textViewOrderList2.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.transparent));
+                textViewOrderList2.setTextColor(ContextCompat.getColor(context, R.color.bizzorange));
                 textViewOrderListStatus1.setText("Order Accepted");
+                textViewOrderListStatus2.setText("Ready to Pick");
                 break;
 
             case "CANCELLED":
                 textViewOrderList1.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.bizzorange));
                 textViewOrderList1.setTextColor(ContextCompat.getColor(context, R.color.white));
+                textViewOrderList2.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.transparent));
+                textViewOrderList2.setTextColor(ContextCompat.getColor(context, R.color.bizzorange));
                 textViewOrderListStatus1.setText("Order Cancelled");
+                textViewOrderListStatus2.setText("   ---");
                 break;
 
 
@@ -152,18 +165,12 @@ public class ExpandableListAdapterOrdersList extends BaseExpandableListAdapter {
 
         final HashMap foodItem = (HashMap) getChild(groupPosition, childPosition);
 
-        Log.i("Food Items at group pos" , foodItemOrderList.get(groupPosition).get(childPosition).toString());
-        Log.i("Food Item at child pos from getchild" , foodItem.toString());
-        Log.i("child position" , String.valueOf(childPosition));
-        Log.i("group position" , String.valueOf(groupPosition));
-
         if (convertView1 == null) {
             infalInflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             if (infalInflater != null) {
                 convertView1 = infalInflater.inflate(R.layout.order_list_fooditem_card, parent, false);
             }
         }
-
         final ProgressBar progressBarFoodItemImage = convertView1.findViewById(R.id.progressBarFoodItemImage);
         ImageView foodItemImageOrdersList = convertView1.findViewById(R.id.foodItemImageOrdersList);
         TextView foodItemNameOrdersList = convertView1.findViewById(R.id.foodItemNameOrdersList);
@@ -173,7 +180,6 @@ public class ExpandableListAdapterOrdersList extends BaseExpandableListAdapter {
         String pic = foodItem.get("pic").toString();
         storageRefFoodItemImage = Home.storageRef.child(pic);
         Glide.with(foodItemImageOrdersList.getContext()).using(new FirebaseImageLoader()).load(storageRefFoodItemImage)
-//                .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
                 .listener(new RequestListener<StorageReference, GlideDrawable>() {
                     @Override
                     public boolean onException(Exception e, StorageReference model, Target<GlideDrawable> target, boolean isFirstResource) {

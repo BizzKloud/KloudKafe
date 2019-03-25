@@ -90,6 +90,7 @@ public class RecyclerViewAdapterVendorList extends RecyclerView.Adapter<Recycler
                 Home.ft.replace(R.id.rootLayout,fragment , fragment.getClass().getName());
                 Home.ft.addToBackStack(null);
                 Home.ft.commit();
+                Home.home.setAdvCounter();
             }
         });
 

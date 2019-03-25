@@ -36,7 +36,7 @@
         <item name="android:background">@drawable/circular_corners</item>
     </style>
 
-    <style name="circular_corners_only_top" >
+       <style name="circular_corners_only_top" >
         <item name="android:background">@drawable/circular_corners_only_top</item>
     </style>
 
