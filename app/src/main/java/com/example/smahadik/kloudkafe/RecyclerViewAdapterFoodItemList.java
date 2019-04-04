@@ -128,12 +128,14 @@ public class RecyclerViewAdapterFoodItemList extends RecyclerView.Adapter<Recycl
     }
 
 
-    public void showEnlargeImage(HashMap foodItemHashMap) {
+    private void showEnlargeImage(HashMap foodItemHashMap) {
         imageEnlargeDialog = new Dialog(context);
         imageEnlargeDialog.setContentView(R.layout.image_enlarge_cardview);
+        imageEnlargeDialog.setCanceledOnTouchOutside(false);
 
         ImageView imageViewEnlargeImage = imageEnlargeDialog.findViewById(R.id.imageViewEnlargeImage);
         TextView textViewEnlargeImage = imageEnlargeDialog.findViewById(R.id.textViewEnlargeImage);
+        ImageButton closeEnlargeImageButton = imageEnlargeDialog.findViewById(R.id.closeEnlargeImageButton);
         final ProgressBar progressBarEnlargeImage = imageEnlargeDialog.findViewById(R.id.progressBarEnlargeImage);
 
         fooditemStorageRef = Home.storageRef.child(foodItemHashMap.get("pic").toString());
@@ -142,9 +144,7 @@ public class RecyclerViewAdapterFoodItemList extends RecyclerView.Adapter<Recycl
                 .load(fooditemStorageRef)
                 .listener(new RequestListener<StorageReference, GlideDrawable>() {
                     @Override
-                    public boolean onException(Exception e, StorageReference model, Target<GlideDrawable> target, boolean isFirstResource) {
-                        return false;
-                    }
+                    public boolean onException(Exception e, StorageReference model, Target<GlideDrawable> target, boolean isFirstResource) { return false; }
                     @Override
                     public boolean onResourceReady(GlideDrawable resource, StorageReference model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
                         progressBarEnlargeImage.setVisibility(View.GONE);
@@ -153,6 +153,13 @@ public class RecyclerViewAdapterFoodItemList extends RecyclerView.Adapter<Recycl
                 })
                 .into(imageViewEnlargeImage);
         textViewEnlargeImage.setText(foodItemHashMap.get("name").toString());
+
+        closeEnlargeImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imageEnlargeDialog.dismiss();
+            }
+        });
 
         imageEnlargeDialog.show();
     }

@@ -170,11 +170,11 @@ public class CartFragment extends Fragment {
         payModePopUp.setContentView(R.layout.pay_mode_card);
 
         TextView payModeTitleAmountTextView = payModePopUp.findViewById(R.id.payModeTitleAmountTextView);
-        TextView textViewTotalPayMode = payModePopUp.findViewById(R.id.textViewTotalPayMode);
+//        TextView textViewTotalPayMode = payModePopUp.findViewById(R.id.textViewTotalPayMode);
         Button closePayModeButton = payModePopUp.findViewById(R.id.closePayModeButton);
         Button cashButton = payModePopUp.findViewById(R.id.cashButton);
         payModeTitleAmountTextView.setText(Home.currencyFc + Home.formatter.format(Home.orderDetails.get("grandTotal")));
-        textViewTotalPayMode.setText(Home.currencyFc + Home.formatter.format(Home.orderDetails.get("grandTotal")));
+//        textViewTotalPayMode.setText(Home.currencyFc + Home.formatter.format(Home.orderDetails.get("grandTotal")));
 
         closePayModeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -186,10 +186,17 @@ public class CartFragment extends Fragment {
         cashButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Home.home.setAdvCounter();
-                payModePopUp.dismiss();
-                Home.clearCartStandbyTimer.cancel();
-                showPopUpPayModeConfirmation();
+                ConnectivityManager conMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo netInfo = conMgr.getActiveNetworkInfo();
+                if (netInfo != null && netInfo.isConnected()){
+                    payModePopUp.dismiss();
+                    Home.clearCartStandbyTimer.cancel();
+                    Home.home.setAdvCounter();
+                    getOrderId();
+                }else {
+                    Toast.makeText(getContext(), "Check INTERNET Connection", Toast.LENGTH_LONG).show();
+                }
+
             }
         });
 
@@ -198,44 +205,44 @@ public class CartFragment extends Fragment {
     }
 
 
-    public void showPopUpPayModeConfirmation() {
-
-        // INTERNET CONNECTION
-        ConnectivityManager conMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = conMgr.getActiveNetworkInfo();
-        if (netInfo != null && netInfo.isConnected()){
-            payModeConfirmationPopUp = new Dialog(getContext());
-            payModeConfirmationPopUp.setCanceledOnTouchOutside(false);
-            payModeConfirmationPopUp.setContentView(R.layout.placeorder_confirmation_popup_card);
-
-            Button placeOrderCancelButton = payModeConfirmationPopUp.findViewById(R.id.placeOrderCancelButton);
-            Button placeOrderYesButton = payModeConfirmationPopUp.findViewById(R.id.placeOrderYesButton);
-
-            placeOrderCancelButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Home.home.setAdvCounter();
-                    payModeConfirmationPopUp.dismiss();
-                }
-            });
-            placeOrderYesButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Home.home.setAdvCounter();
-                    payModeConfirmationPopUp.dismiss();
-                    payModePopUp.dismiss();
-                    getOrderId();
-                }
-            });
-
-            payModeConfirmationPopUp.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            payModeConfirmationPopUp.show();
-
-        } else {
-            Toast.makeText(getContext(), "Check INTERNET Connection", Toast.LENGTH_LONG).show();
-        }
-
-    }
+//    public void showPopUpPayModeConfirmation() {
+//
+//        // INTERNET CONNECTION
+//        ConnectivityManager conMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+//        NetworkInfo netInfo = conMgr.getActiveNetworkInfo();
+//        if (netInfo != null && netInfo.isConnected()){
+//            payModeConfirmationPopUp = new Dialog(getContext());
+//            payModeConfirmationPopUp.setCanceledOnTouchOutside(false);
+//            payModeConfirmationPopUp.setContentView(R.layout.placeorder_confirmation_popup_card);
+//
+//            Button placeOrderCancelButton = payModeConfirmationPopUp.findViewById(R.id.placeOrderCancelButton);
+//            Button placeOrderYesButton = payModeConfirmationPopUp.findViewById(R.id.placeOrderYesButton);
+//
+//            placeOrderCancelButton.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Home.home.setAdvCounter();
+//                    payModeConfirmationPopUp.dismiss();
+//                }
+//            });
+//            placeOrderYesButton.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Home.home.setAdvCounter();
+//                    payModeConfirmationPopUp.dismiss();
+//                    payModePopUp.dismiss();
+//                    getOrderId();
+//                }
+//            });
+//
+//            payModeConfirmationPopUp.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//            payModeConfirmationPopUp.show();
+//
+//        } else {
+//            Toast.makeText(getContext(), "Check INTERNET Connection", Toast.LENGTH_LONG).show();
+//        }
+//
+//    }
 
 
     public void setPayNow() {
@@ -300,7 +307,10 @@ public class CartFragment extends Fragment {
             public void onTick(long millisUntilFinished) { }
 
             @Override
-            public void onFinish() { Home.navigation.setSelectedItemId(R.id.navigation_order); }
+            public void onFinish() {
+                Home.home.clearcart();
+                Home.navigation.setSelectedItemId(R.id.navigation_order);
+            }
         }.start();
 //        Home.ft = Home.fragmentManager.beginTransaction();
 //        Home.ft.replace(R.id.rootLayout, new OrdersPageFragment());

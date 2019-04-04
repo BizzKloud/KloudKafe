@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
+import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -27,6 +28,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -40,6 +42,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -75,7 +78,7 @@ public class Home extends AppCompatActivity {
     CollectionReference categoryItemRef;
 
     Intent login;
-    Intent logout;
+//    Intent logout;
     ImageView logoutImageView;
     Boolean logoutActive = false;
     int logoutCounter = 0;
@@ -159,6 +162,9 @@ public class Home extends AppCompatActivity {
     int vendorTaxindex = -1;
     Boolean firstTimeCat = true;
 
+    //LOCK INITIALS
+    DevicePolicyManager dpm;
+
 
     public static int width;
     DisplayMetrics metrics = new DisplayMetrics();
@@ -214,10 +220,30 @@ public class Home extends AppCompatActivity {
     };
 
 
+
+
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//
+//        if (dpm.isLockTaskPermitted(getApplicationContext().getPackageName())) {
+//            this.startLockTask();
+//        } else {
+//            Toast.makeText(home, "ERROR LOCKING DEVICE", Toast.LENGTH_LONG).show();
+//        }
+//    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_home);
+
+        // Setting LOCKS
+        Context context = getApplicationContext();
+        dpm = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        this.startLockTask();
 
 
         fragmentManager = getFragmentManager();
@@ -1234,6 +1260,15 @@ public class Home extends AppCompatActivity {
 //        super.onBackPressed();
     }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if(!hasFocus) {
+            // Close every kind of system dialog
+            Intent closeDialog = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+            sendBroadcast(closeDialog);
+        }
+    }
 
 
 
@@ -1411,11 +1446,17 @@ public class Home extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(editTextLogoutPopupPassword.getText().toString().equals(adminDetails.get("password").toString())) {
-                    db.document(fcDetails.get("fcid") + "/TableM/" + tableDetails.get("tabid")).update("status" , false);
-                    logout = new Intent(Home.this, Login.class);
-                    startActivity(logout);
-                    System.exit(0);
-                    finish();
+                    db.document(fcDetails.get("fcid") + "/TableM/" + tableDetails.get("tabid")).update("status" , false)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    home.stopLockTask();
+                                    System.exit(0);
+                                    finish();
+                                }
+                            });
+//                    logout = new Intent(Home.this, Login.class);
+//                    startActivity(logout);
                 } else {
                     Toast.makeText(Home.this, "Authentication Failed !!", Toast.LENGTH_SHORT).show();
                     editTextLogoutPopupPassword.setText("");
